@@ -74,6 +74,9 @@ class Loader
      */
     static public function loadCustomClass($name, $test = false)
     {
+
+        return false; // Функционал отключен
+
         $fullName = $name;
         //$name = ltrim(strtolower($name), ' \\'); // Оказалось не удобно
         $name = ltrim($name, ' \\');

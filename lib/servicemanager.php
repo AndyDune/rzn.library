@@ -11,8 +11,10 @@ namespace Rzn\Library;
 use Rzn\Library\ServiceManager\FactoryInterface;
 use Rzn\Library\ServiceManager\InvokeInterface;
 use Rzn\Library\ServiceManager\InterfaceInitializer;
+use Rzn\Library\ServiceManager\ServiceLocatorInterface;
 
-class ServiceManager
+
+class ServiceManager implements ServiceLocatorInterface
 {
     protected $instances = array();
 

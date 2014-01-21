@@ -1,15 +1,14 @@
 <?php
 /**
- * Dune Framework
+ * rzn.library
  * 
  * Класс - оболочка для работы с сессией.
  * 
  * ----------------------------------------------------
- * | Библиотека: Dune                                  |
+ * | Библиотека:  rzn.library                          |
  * | Файл: Session.php                                 |
- * | В библиотеке: Dune/Session.php                    |
  * | Автор: Андрей Рыжов (Dune) <dune@rznw.ru>         |
- * | Версия: 1.11                                      |
+ * | Версия: 2.0                                       |
  * | Сайт: www.rznw.ru                                 |
  * ----------------------------------------------------
  * 
@@ -17,58 +16,15 @@
  * История версий:
  * -----------------
  * 
- * 1.11 (2009 март 26)
- * Метов возврата имени зоны сессии.
- * 
- * 1.10 (2009 февраль 18)
- * Внедрен метод установки идентификатора сессии.
- * 
- * 1.09 (2008 декабрь 09)
- * Новый метод clearZone(). Присвоение области сессии пустого массива. Аналог killZone().
- * 
- * 1.08 (2008 декабрь 05)
- * Добавлен метод getInt() - возврат числа типа integer. Удаляет пробелы.
- * Добавлена реализация интерфейса Countable. Колличество элементов в зоне.
- * 
- * 1.07 (2008 ноябрь 05)
- * Добавлены магич. методы __isset и __unset для массива зоны.
- * 
- * 1.06 (2008 октябрь 21)
- * Добавлен метод getFloat() - возврат числа типа float. Удаляет пробелы, заменяет запятые на точки.
- * 
- * 1.05 (9 октября 2008)
- * Блокировка зоны с ключём.
- * 
- * 1.04 (8 октября 2008)
- * Установка зоны во время вызова синглетона.
- * Изменена проверка на авторизованную сессию.
- * Блокирования зон на всём протяжении сессии.
- * 
- * 1.02 -> 1.03 (2 сетнября 2008)
- * Незначительная ошибка вывода массива области на тестовую печать.
- * Метод setZone() - новый.
- * 
- * 1.01 -> 1.02 (1 сетнября 2008)
- * Введега начальная инициилизация массивов облстей видимости.
- * Метод getZone().
- * 
- * 1.00 -> 1.01 (29 августа 2008)
- * Добавлен метод _toString() - тестовая печать массива текущей области.
- * 
- * 0.97 -> 1.00 (28 августа 2008)
- * Добавлена реализация интерфейса Iterator
- * 
- * 0.96 -> 0.97
- * Добавлена константа ZONE_CAPTCHA
- * 
- * 0.95 -> 0.96
- * Введение статичной переменной $auth - индикатор авторизованной сессии
- * 
+ * 2.0 (2014 января 21)
+ * Удален синглетон. Используется как сервис.
+ *
  *
  */
 
 namespace Rzn\Library;
-class Session implements \Iterator, \ArrayAccess, \Countable
+use Rzn\Library\ServiceManager\InvokeInterface;
+class Session implements \Iterator, \ArrayAccess, \Countable, InvokeInterface
 {
    /**
     * Используемая в данный момент зона
@@ -88,15 +44,13 @@ class Session implements \Iterator, \ArrayAccess, \Countable
      */
     protected $_lokingZoneName = '_lkLKkjasd12_';
     
-    static public $auth = false;
-    
    /**
     * Иниц. при первом вызове стат. метода и возвращается при последующих
     *
     * @var Session
     * @access private
     */
-    static private $instance = NULL;
+    //static private $instance = NULL;
  
     
     const ZONE_DEFAULT    = 'default____';
@@ -114,6 +68,8 @@ class Session implements \Iterator, \ArrayAccess, \Countable
    * @param string $zone имя зоны. Если не указано - зона по умолчанию
    * @return Session
    */
+    /*
+     * Было до преобразоваеия в сервис
     static public function getInstance($zone = null)
     {
         if (self::$instance == NULL)
@@ -126,31 +82,19 @@ class Session implements \Iterator, \ArrayAccess, \Countable
             self::$instance->openZone(Session::ZONE_DEFAULT);
         return self::$instance;
     }
+    */
 
-    /**
-     * Проверка старта сессии
-     * true - сессия открыта
-     *
-     * @return boolean
-     */
-    static public function started()
-    {
-        if (self::$instance == null)
-        {
-            $bool = false;
-        }
-        else 
-        {
-            $bool = true;
-        }
-        return $bool;
-    }
-    
+
 
 /////////////////////////////////////////////////////////////////////
 //////////////////////////////      Публичные методы
     
-    
+    public function invoke($sm)
+    {
+        $this->openZone(Session::ZONE_DEFAULT);
+    }
+
+
     /**
      * Открывает зону в пространстве сессии
      *
@@ -229,7 +173,7 @@ class Session implements \Iterator, \ArrayAccess, \Countable
      */
     public function destroy()
     {
-        self::$auth = false;        
+        //self::$auth = false;
         unset($_SESSION);
         session_destroy();
     }
@@ -335,13 +279,13 @@ class Session implements \Iterator, \ArrayAccess, \Countable
             return true;
         if (array_key_exists($this->_usingZone, $_SESSION[$this->_lokingZoneName]))
         {
-            throw new \Exception('Попытка редактирования заблокированной зоны. Зона: ' . $this->_usingZone);
+            throw new Exception('Попытка редактирования заблокированной зоны. Зона: ' . $this->_usingZone);
         }
     }
    /**
-    * @access private
+    * @access public
     */
-    private function __construct($name = '')
+    public function __construct()
     {
 
     }

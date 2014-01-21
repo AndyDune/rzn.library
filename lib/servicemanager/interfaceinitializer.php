@@ -38,5 +38,7 @@ class InterfaceInitializer
             $object->setDb($reg->getGlobal('DB'));
         if ($object instanceof BitrixUserInterface)
             $object->setUser($reg->getGlobal('USER'));
+        if ($object instanceof ServiceLocatorAwareInterface)
+            $object->setServiceLocator($this->sm);
     }
 } 

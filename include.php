@@ -12,23 +12,28 @@ CModule::AddAutoloadClasses(
     )
 );
 
+//// Автозагрузка для версии битрикса до 14
 spl_autoload_register(array('Rzn\Library\Loader', 'autoload'));
 
 IncludeModuleLangFile(__FILE__);
 
 use Rzn\Library\Registry;
-use Rzn\Library\Session;
 
 $sm = Registry::getServiceManager();
 
 $sm->setInitializer(new \Rzn\Library\ServiceManager\InterfaceInitializer($sm));
 
+/*
+ * Теперь без синглетона
 $sm->setFactory('session', function($m){
     $object = Session::getInstance();
     return $object;
 });
-
-//$sm->setInvokableClass('string_explode', 'Rzn\Library\String\Explode');
+*/
+$sm->setInvokableClass('session', 'Rzn\Library\Session');
 $sm->setInvokableClass('plugin_manager', 'Rzn\Library\Component\HelperManager');
-$sm->setAlias('helper_manager', 'plugin_manager');
 $sm->setInvokableClass('test_data', 'Rzn\Library\Directory\AsArray');
+
+$sm->get('plugin_manager')->setInitializer(new \Rzn\Library\ServiceManager\InterfaceInitializer($sm));
+
+$sm->setAlias('helper_manager', 'plugin_manager');
