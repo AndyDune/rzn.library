@@ -9,7 +9,7 @@
 namespace Rzn\Library\ServiceManager;
 use Rzn\Library\Registry;
 
-class InterfaceInitializer
+class InterfaceInitializer implements InitializerInterface
 {
     /**
      * @var \Rzn\Library\ServiceManager

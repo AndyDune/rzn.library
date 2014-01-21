@@ -10,7 +10,7 @@ namespace Rzn\Library;
 
 use Rzn\Library\ServiceManager\FactoryInterface;
 use Rzn\Library\ServiceManager\InvokeInterface;
-use Rzn\Library\ServiceManager\InterfaceInitializer;
+use Rzn\Library\ServiceManager\InitializerInterface;
 use Rzn\Library\ServiceManager\ServiceLocatorInterface;
 
 
@@ -48,9 +48,9 @@ class ServiceManager implements ServiceLocatorInterface
     protected $throwExceptionInCreate = true;
 
     /**
-     * @var InterfaceInitializer
+     * @var InitializerInterface
      */
-    protected $interfaceInitializer = null;
+    protected $interfaceInitializer = array();
 
 
     /**
@@ -71,9 +71,9 @@ class ServiceManager implements ServiceLocatorInterface
      * @param InterfaceInitializer $object
      * @return $this
      */
-    public function setInitializer(InterfaceInitializer $object)
+    public function setInitializer(InitializerInterface $object)
     {
-        $this->interfaceInitializer = $object;
+        $this->interfaceInitializer[] = $object;
         return $this;
     }
 
@@ -168,11 +168,13 @@ class ServiceManager implements ServiceLocatorInterface
             $this->instances[$cName] = $instance;
         }
 
+        if (count($this->interfaceInitializer))
+            foreach($this->interfaceInitializer as $interfaceInitializer)
+                $interfaceInitializer->initialize($instance);
+
         end:
         if (is_object($instance) and $instance instanceof InvokeInterface)
             $instance->invoke($this);
-        if ($this->interfaceInitializer)
-            $this->interfaceInitializer->initialize($instance);
         return $instance;
     }
 
