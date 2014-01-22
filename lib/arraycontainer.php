@@ -5,6 +5,7 @@
  *
  * Оболочка для массива.
  * Для автоматической обработки несуществующих ключей.
+ * Может оставить в массиве ключи только из указанного списка.
  *
  */
 
@@ -16,16 +17,21 @@ class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
     protected $_arraySourse = array();
     protected $_defaultValue = null;
 
-    public function __construct($array, $defaultValue = null)
+    /**
+     * @param $array целевой масив
+     * @param null $defaultValue значение по-умолчанию
+     * @param bool $nested допускать обработку вложенных массивов.
+     */
+    public function __construct($array, $defaultValue = null, $nested = false)
     {
         if (is_array($array) and count($array) > 0)
         {
             $this->_arraySourse = $array;
             foreach ($array as $key =>$value)
             {
-                if (is_array($value))
+                if ($nested and is_array($value))
                 {
-                    $this->_array[$key] = new ArrayContainer($value, $defaultValue);
+                    $this->_array[$key] = new ArrayContainer($value, $defaultValue, $nested);
                 }
                 else
                 {
@@ -46,6 +52,27 @@ class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
     public function count()
     {
         return count($this->_array);
+    }
+
+
+    /**
+     * Оставляет в целевом массиве значения с ключами только из указанного в $keys списка
+     *
+     * @param $keys массив с ключами, которые надо оставить
+     * @return ArrayContainer $this
+     */
+    public function keepKeys($keys)
+    {
+        if (!is_array($keys))
+            $keys = array($keys);
+        $tmp = array();
+        foreach($this->_array as $key => $value)
+        {
+            if(in_array($key, $keys))
+                $tmp[$key] = $value;
+        }
+        $this->_array = $tmp;
+        return $this;
     }
 
     /**
