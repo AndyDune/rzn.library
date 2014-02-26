@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Andrey Ryzhov.
+ * Copyright (c) 2014 Andrey Ryzhov.
  * All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,22 +22,46 @@
  * THE SOFTWARE.
  *
  * @package     rzn.library
+ * @subpackage  Format
  * @author      Andrey Ryzhov <info@rznw.ru>
- * @copyright   2013 Andrey Ryzhov.
+ * @copyright   2014 Andrey Ryzhov.
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  * @link        http://rznw.ru
  */
 
-namespace Rzn\Library\ServiceManager;
+namespace Rzn\Library\Format;
 
 
-interface FactoryInterface
-{
+trait ValueToBitrixBoolTrait {
+
     /**
-     * Создает сервис.
+     * Преобразует ряд значений в принятый битриксом набор ("Y", "N")
      *
-     * @param \Rzn\Library\ServiceManager $serviceLocator
-     * @return mixed
+     * @param bool $flag
+     * @return string
      */
-    public function createService($serviceLocator);
-}
+    public function formatValueToBitrixBool($flag = true)
+    {
+        if (is_bool($flag)) {
+            if ($flag) {
+                $value = 'Y';
+            } else {
+                $value = 'N';
+            }
+        }
+        else if ($flag) {
+            if (is_string($flag) and strtoupper(substr($flag, 0, 1)) == 'Y') {
+                $value = 'Y';
+            } else if (is_string($flag)) {
+                $value = 'N';
+            } else {
+                $value = 'Y';
+            }
+        }
+        else {
+            $value = 'N';
+        }
+        return $value;
+    }
+
+} 

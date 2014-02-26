@@ -31,13 +31,44 @@
 namespace Rzn\Library\ServiceManager;
 
 
-interface FactoryInterface
+class LazyConfig implements InitializerInterface
 {
     /**
-     * Создает сервис.
-     *
-     * @param \Rzn\Library\ServiceManager $serviceLocator
-     * @return mixed
+     * @var \Rzn\Library\ServiceManager
      */
-    public function createService($serviceLocator);
-}
+    protected $sm;
+
+    protected $setters = array();
+
+    /**
+     * @param \Rzn\Library\ServiceManager $sm
+     */
+    public function __construct(\Rzn\Library\ServiceManager $sm)
+    {
+        $this->sm = $sm;
+    }
+
+
+    public function addSetter($class, $method, $params)
+    {
+        $this->setters[$class] = array('method' => $method, 'params' => $params);
+        return $this;
+    }
+
+    public function initialize($object)
+    {
+        if (!is_object($object))
+            return false;
+
+        $class = get_class($object);
+        if (!array_key_exists($class, $this->setters))
+            return true;
+        $method = $this->setters[$class]['method'];
+        $params = $this->setters[$class]['params'];
+        if (!is_array($params))
+            $params = array($params);
+        call_user_func_array(array($object, $method), $params);
+    }
+
+
+} 

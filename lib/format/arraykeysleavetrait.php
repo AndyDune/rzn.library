@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Andrey Ryzhov.
+ * Copyright (c) 2014 Andrey Ryzhov.
  * All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,21 +23,33 @@
  *
  * @package     rzn.library
  * @author      Andrey Ryzhov <info@rznw.ru>
- * @copyright   2013 Andrey Ryzhov.
+ * @copyright   2014 Andrey Ryzhov.
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  * @link        http://rznw.ru
  */
 
-namespace Rzn\Library\ServiceManager;
+namespace Rzn\Library\Format;
 
 
-interface FactoryInterface
+trait ArrayKeysLeaveTrait
 {
     /**
-     * Создает сервис.
+     * Оставить в массиве значения только с указанными ключами.
      *
-     * @param \Rzn\Library\ServiceManager $serviceLocator
-     * @return mixed
+     * @param array $array целевой массив
+     * @param array $keys массив ключей, которые надо оставить в массиве
+     * @return array
      */
-    public function createService($serviceLocator);
-}
+    function arrayKeysLeave($array, $keys)
+    {
+        if (!is_array($keys))
+            $keys = array($keys);
+        $result = array();
+        foreach($array as $key => $value) {
+            if (in_array($key, $keys)) {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+} 

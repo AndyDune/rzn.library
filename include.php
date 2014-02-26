@@ -21,7 +21,12 @@ use Rzn\Library\Registry;
 
 $sm = Registry::getServiceManager();
 
-$sm->setInitializer(new \Rzn\Library\ServiceManager\InterfaceInitializer($sm));
+$sm->addInitializer(new \Rzn\Library\ServiceManager\InterfaceInitializer($sm));
+
+$serviceLazyConfig = new \Rzn\Library\ServiceManager\LazyConfig($sm);
+
+$sm->addInitializer($serviceLazyConfig);
+$sm->setService('service_lazy_config', $serviceLazyConfig);
 
 /*
  * Теперь без синглетона
@@ -34,6 +39,6 @@ $sm->setInvokableClass('session', 'Rzn\Library\Session');
 $sm->setInvokableClass('plugin_manager', 'Rzn\Library\Component\HelperManager');
 $sm->setInvokableClass('test_data', 'Rzn\Library\Directory\AsArray');
 
-$sm->get('plugin_manager')->setInitializer(new \Rzn\Library\ServiceManager\InterfaceInitializer($sm));
+$sm->get('plugin_manager')->addInitializer(new \Rzn\Library\ServiceManager\InterfaceInitializer($sm));
 
 $sm->setAlias('helper_manager', 'plugin_manager');
