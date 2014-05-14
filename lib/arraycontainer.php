@@ -48,27 +48,30 @@ class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
      * @param null $defaultValue значение по-умолчанию
      * @param bool $nested допускать обработку вложенных массивов.
      */
-    public function __construct($array, $defaultValue = null, $nested = false)
+    public function __construct($array= null, $defaultValue = null, $nested = false)
     {
-        if (is_array($array) and count($array) > 0)
-        {
+        $this->init($array, $defaultValue, $nested);
+    }
+
+    public function init($array, $defaultValue = null, $nested = false)
+    {
+        if ($array and is_array($array) and count($array) > 0) {
             $this->_arraySourse = $array;
-            foreach ($array as $key =>$value)
-            {
-                if ($nested and is_array($value))
-                {
+            foreach ($array as $key =>$value) {
+                if ($nested and is_array($value)) {
                     $this->_array[$key] = new ArrayContainer($value, $defaultValue, $nested);
-                }
-                else
-                {
+                } else {
                     $this->_array[$key] = $value;
                 }
             }
+            $this->_defaultValue = $defaultValue;
+        } else {
+            $this->_array = array();
+            $this->_arraySourse = array();
+            $this->_defaultValue = null;
         }
-//		$this->_array = $array;
-        $this->_defaultValue = $defaultValue;
+        return $this;
     }
-
     /**
      * Возвращает колличество элементов массива
      * Реализует интрефейс Countable

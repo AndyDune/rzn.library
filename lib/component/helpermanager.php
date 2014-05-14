@@ -1,4 +1,11 @@
 <?
+/**
+ * ----------------------------------------------------
+ * | Автор: Андрей Рыжов (Dune) <info@rznw.ru>         |
+ * | Сайт: www.rznw.ru                                 |
+ * | Телефон: +7 (4912) 51-10-23                       |
+ * ----------------------------------------------------
+ */
 namespace Rzn\Library\Component;
 use Rzn\Library\ServiceManager;
 use Rzn\Library\Exception;
@@ -71,6 +78,18 @@ class HelperManager extends ServiceManager implements ServiceLocatorAwareInterfa
 
     }
 
+    /**
+     * Возвращает справочную информацию о зарегистрированных хелперах.
+     * @return string
+     */
+    public function help()
+    {
+        ob_start();
+        echo '<pre>';
+        print_r($this->invokableClasses);
+        echo '</pre>';
+        $result = ob_get_clean();
 
-
+        return $result;
+    }
 }

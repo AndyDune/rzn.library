@@ -7,21 +7,18 @@
  * ----------------------------------------------------
  */
 
-namespace Rzn\Library\ServiceManager;
+namespace Rzn\Library;
 
 
-interface BitrixDbInterface {
-
+class Request
+{
     /**
-     * @param \CDatabase $db
-     * @return mixed
+     * Является ли запрос аяксовым.
+     * @return bool
      */
-    public function setDb($db);
+    public function isAjax()
+    {
+        return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
+    }
 
-
-    /**
-     * \CDatabase
-     * @return mixed
-     */
-    public function getDb();
 } 

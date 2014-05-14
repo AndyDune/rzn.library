@@ -7,21 +7,20 @@
  * ----------------------------------------------------
  */
 
+
 namespace Rzn\Library\ServiceManager;
 
-
-interface BitrixDbInterface {
-
+interface SessionServiceInterface
+{
     /**
-     * @param \CDatabase $db
+     * @param \Rzn\Library\Session $service
      * @return mixed
      */
-    public function setDb($db);
-
+    public function setSessionService($service);
 
     /**
-     * \CDatabase
-     * @return mixed
+     * @param $service
+     * @return \Rzn\Library\Session
      */
-    public function getDb();
+    public function getSessionService($service);
 } 

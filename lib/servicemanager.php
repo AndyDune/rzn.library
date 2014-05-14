@@ -638,4 +638,29 @@ class ServiceManager implements ServiceLocatorInterface
         }
     }
 
+    /**
+     * Возвращает справочную информацию о зарегистрированных хелперах.
+     * @return string
+     */
+    public function help()
+    {
+        ob_start();
+        ?><h3>invokableClasses</h3><?
+        echo '<pre>';
+        print_r($this->invokableClasses);
+        echo '</pre>';
+        ?><h3>factories</h3><?
+        echo '<pre>';
+        print_r($this->factories);
+        echo '</pre>';
+        ?><h3>aliases</h3><?
+        echo '<pre>';
+        print_r($this->aliases);
+        echo '</pre>';
+
+        $result = ob_get_clean();
+
+        return $result;
+    }
+
 } 

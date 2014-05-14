@@ -14,8 +14,6 @@
 
 namespace Rzn\Library\Component\Helper;
 
-
-namespace Rzn\Library\Component\Helper;
 use Rzn\Library\Component\HelperAbstract;
 
 class DrawImage extends HelperAbstract

@@ -159,10 +159,29 @@ class Registry extends \ArrayObject
     }
 
     /**
+     * Возвращает самый важный объект
+     *
+     * @return \CMain
+     */
+    public static function getApplication()
+    {
+        // @return \Bitrix\Main\Application
+        return $GLOBALS['APPLICATION'];
+        //return \Bitrix\Main\Application::getInstance();
+    }
+
+
+    /**
      * @return object
      */
     public static function getGlobal($key)
     {
+        /** Для поддержки старых вариантов использования  - отключено */
+        /*
+        if (strtoupper($key) == 'APPLICATION') {
+            return static::getApplication();
+        }
+        */
         return $GLOBALS[$key];
     }
 
@@ -178,7 +197,7 @@ class Registry extends \ArrayObject
      * @return mixed
      * @throws \Exception if no entry is registerd for $index.
      */
-    public static function get($index)
+    public static function get($index, $default = null)
     {
         $instance = self::getInstance();
 
@@ -187,7 +206,7 @@ class Registry extends \ArrayObject
             if ($index == 'ROOT' or $index == 'DOCUMENT_ROOT')
                 return $_SERVER['DOCUMENT_ROOT'];
 
-            return null;
+            return $default;
             throw new \Exception("No entry is registered for key '$index'");
         }
 
