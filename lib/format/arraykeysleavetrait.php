@@ -52,4 +52,65 @@ trait ArrayKeysLeaveTrait
         }
         return $result;
     }
+
+    function arrayKeysAddIfNotExist($array, $keys, $default = null)
+    {
+        if (!is_array($keys))
+            $keys = array($keys);
+        foreach($keys as $key) {
+            if (!array_key_exists($key, $array)) {
+                $array[$key] = $default;
+            }
+        }
+        return $array;
+    }
+
+
+    function arrayKeysIntVal($array, $keys)
+    {
+        if (!is_array($keys))
+            $keys = array($keys);
+        $result = array();
+        foreach($array as $key => $value) {
+            if (in_array($key, $keys)) {
+                $result[$key] = intval($value);
+            } else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+
+    function arrayKeysTrim($array, $keys)
+    {
+        if (!is_array($keys))
+            $keys = array($keys);
+        $result = array();
+        foreach($array as $key => $value) {
+            if (in_array($key, $keys)) {
+                $result[$key] = trim($value);
+            } else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+
+
+    function arrayKeysDoubleVal($array, $keys)
+    {
+        if (!is_array($keys))
+            $keys = array($keys);
+        $result = array();
+        foreach($array as $key => $value) {
+            if (in_array($key, $keys)) {
+                $result[$key] = doubleval($value);
+            } else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+
+
 } 

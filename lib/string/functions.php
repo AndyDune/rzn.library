@@ -1,10 +1,10 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
- * User: User
- * Date: 04.10.13
- * Time: 14:54
- * To change this template use File | Settings | File Templates.
+ * ----------------------------------------------------
+ * | Автор: Андрей Рыжов (Dune) <info@rznw.ru>         |
+ * | Сайт: www.rznw.ru                                 |
+ * | Телефон: +7 (4912) 51-10-23                       |
+ * ----------------------------------------------------
  */
 
 namespace Rzn\Library\String;

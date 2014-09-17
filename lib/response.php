@@ -24,8 +24,11 @@
  */
 
 namespace Rzn\Library;
+use Rzn\Library\ServiceManager\ServiceLocatorAwareInterface;
+use Rzn\Library\ServiceManager\ServiceLocatorInterface;
+use Rzn\Library\ServiceManager\BitrixUserInterface;
 
-class Response implements \Iterator, \ArrayAccess, \Countable
+class Response implements \Iterator, \ArrayAccess, \Countable, ServiceLocatorAwareInterface, BitrixUserInterface
 {
     protected $mainContentBuffer = false;
 
@@ -33,7 +36,59 @@ class Response implements \Iterator, \ArrayAccess, \Countable
 
     protected $isJson = null;
 
+    protected $layout = 'default';
+
+    protected $subLayoutName   = '';
+    protected $subLayoutParams = [];
+
     protected $array = [];
+
+
+    protected $serviceManager = null;
+
+    /**
+     * @var \CUser
+     */
+    protected $user = null;
+
+
+    /**
+     * @param \CUser $user
+     * @return mixed
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @return \CUser
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+
+    /**
+     * Внедрение сервис локатора
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     */
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->serviceManager = $serviceLocator;
+    }
+
+    /**
+     * Возврат сервис локатора.
+     *
+     * @return ServiceLocatorInterface
+     */
+    public function getServiceLocator()
+    {
+        return $this->serviceManager;
+    }
 
     /**
      * Используется в футере (footer.php) для сохранения основного содержимого.
@@ -53,6 +108,97 @@ class Response implements \Iterator, \ArrayAccess, \Countable
     {
         $this->isJson = $flag;
         return $this;
+    }
+
+    public function setLayout($name = '')
+    {
+        $this->layout = $name;
+        return $this;
+    }
+
+    /**
+     * Установка сублейаута. Общего для нескольких страниц участка в разметке в рамках генерального лейаута.
+     *
+     * @param $name имя подключаемого файла
+     * @param array $params параметры для передачи в лейаут
+     * @return $this
+     */
+    public function setSubLayout($name, $params = [])
+    {
+        $this->subLayoutName   = $name;
+        $this->subLayoutParams = $params;
+        return $this;
+    }
+
+    public function getSubLayout()
+    {
+
+        return $this->subLayoutName;
+    }
+
+    /**
+     * Выбрать параметры для передачи в шаблон сублейаута.
+     *
+     * @param null $key
+     * @param string $default
+     * @return array|string
+     */
+    public function getSubLayoutParam($key = null, $default = '')
+    {
+        if (!$key) {
+            return $this->subLayoutParams;
+        }
+        if (isset($this->subLayoutParams[$key])) {
+            return $this->subLayoutParams[$key];
+        }
+        return $default;
+    }
+
+
+    /**
+     * Уставновка свойства для передачи в шаблон сублейацта.
+     *
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function setSubLayoutParam($key, $value)
+    {
+        $this->subLayoutParams[$key] = $value;
+        return $this;
+    }
+
+
+    /**
+     * Возможность запускать хелперы шаблонов из сублейаутов.
+     *
+     * @param $function
+     * @param $params
+     * @return mixed
+     */
+    public function __call($function, $params)
+    {
+        $helper = Registry::getServiceManager()->get('helper_manager');
+        return call_user_func_array([$helper, $function], $params);
+    }
+
+    /**
+     * Подключать сублейаут.
+     *
+     * @param $rootDir
+     * @return $this
+     */
+    public function includeSubLayout($rootDir)
+    {
+        ob_start();
+        include($rootDir . '/' . $this->getSubLayout() . '.php');
+        $this->setMainContent(ob_get_clean());
+        return $this;
+    }
+
+    public function getLayout()
+    {
+        return $this->layout;
     }
 
     /**
