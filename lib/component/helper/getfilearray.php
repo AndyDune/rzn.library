@@ -36,9 +36,11 @@ class GetFileArray extends HelperAbstract
             $sizes = array('width' => $this->params['width']);
             if (isset($this->params['height'])) {
                 $sizes['height'] = $this->params['height'];
+            } else {
+                // Пропорционально восстанавливаем высоту
+                $sizes['height'] = floor($result['HEIGHT'] * $sizes['width'] / $result['WIDTH']);
             }
             $result = CFile::ResizeImageGet($result, $sizes, BX_RESIZE_IMAGE_PROPORTIONAL, true);
-            //pr($result);
         }
         return $result;
     }

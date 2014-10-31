@@ -50,6 +50,15 @@ class Url extends HelperAbstract implements ServiceLocatorAwareInterface
                 $subDomain = null;
             }
         }
+        if (isset($config['use_current'])) {
+            $params = array_merge($params, $_GET);
+        }
+        if (isset($config['delete_params'])) {
+            foreach ($config['delete_params'] as $run) {
+                unset($params[$run]);
+            }
+
+        }
         $this->config = $config;
         $url = $this->_buildUrl($url, $subDomain, $params);
         return $url;

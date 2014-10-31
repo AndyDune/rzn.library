@@ -18,7 +18,7 @@ use Rzn\Library\ServiceManager\InvokeInterface;
 
 class IncludeWithTemplate implements InvokeInterface
 {
-    protected $params = [];
+    protected $_params = [];
 
     protected $successIncludeFlag = false;
     protected $freeIncludeFlag = false;
@@ -37,7 +37,7 @@ class IncludeWithTemplate implements InvokeInterface
 
     public function __invoke($name, $params = [])
     {
-        $this->params = $params;
+        $this->_params = $params;
 
         $path = $_SERVER['DOCUMENT_ROOT'] . '/local/templates/' . SITE_TEMPLATE_ID . '/include/component/' . $name . '.php';
         if (is_file($path)) {
@@ -93,8 +93,8 @@ class IncludeWithTemplate implements InvokeInterface
 
     protected function __get($key)
     {
-        if (isset($this->params[$key])) {
-            return $this->params[$key];
+        if (isset($this->_params[$key])) {
+            return $this->_params[$key];
         }
         return null;
     }
