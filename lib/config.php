@@ -78,6 +78,75 @@ class Config implements Countable, Iterator, ArrayAccess
     }
 
     /**
+     * Присоединение призвольного массива в конфигурацию
+     *
+     * @param array $array
+     * @return $this
+     */
+    public function addConfig($array)
+    {
+        if (is_array($array)) {
+            $this->merge(new Config($array));
+        }
+        return $this;
+
+    }
+
+    /**
+     * Добавление конфига для шаблона.
+     * @return $this
+     */
+    public function addTemplate()
+    {
+        $file = $_SERVER['DOCUMENT_ROOT'] . '/local/templates/' . SITE_TEMPLATE_ID . '/config/template.config.php';
+        if (is_readable($file)) {
+            $this->merge(new Config(include($file)));
+        }
+        return $this;
+
+    }
+
+    public function addApplication()
+    {
+        $file = $_SERVER['DOCUMENT_ROOT'] . '/local/config/application.config.php';
+        if (is_readable($file)) {
+            $this->merge(new Config(include($file)));
+        }
+        return $this;
+    }
+
+    public function addModule($module)
+    {
+        //$file = $directory . '/config/module.config.php';
+        $file = $_SERVER['DOCUMENT_ROOT'] . '/local/modules/'. $module . '/config/module.config.php';
+        if (is_readable($file)) {
+            $this->merge(new Config(include($file)));
+        }
+        return $this;
+    }
+
+
+    /**
+     * Выборка значения с учетом вложения.
+     *
+     * @param $name
+     * @param null $default
+     * @param string $separator
+     */
+    public function getNested($name, $default = null, $separator = '.')
+    {
+        $keys = explode($separator, $name);
+        $data = $this->toArray();
+        foreach ($keys as $key) {
+            if(!is_array($data) or !array_key_exists($key, $data)) {
+                return $default;
+            }
+            $data = $data[$key];
+        }
+        return $data;
+    }
+
+    /**
      * Retrieve a value and return $default if there is no element set.
      *
      * @param  string $name
@@ -101,6 +170,8 @@ class Config implements Countable, Iterator, ArrayAccess
      */
     public function __get($name)
     {
+        //echo $name;
+        //pr($this->data[$name]);
         return $this->get($name);
     }
 

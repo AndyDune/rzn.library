@@ -13,12 +13,15 @@ namespace Rzn\Library\ServiceManager;
 interface BitrixUserInterface
 {
     /**
+     * Инъекция объекта битрикса о пользователе.
+     *
      * @param \CUser $user
      * @return mixed
      */
     public function setUser($user);
 
     /**
+     * Возврат объекта битрикса о пользователе.
      * @return \CUser
      */
     public function getUser();

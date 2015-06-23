@@ -53,7 +53,36 @@ class Url extends HelperAbstract implements ServiceLocatorAwareInterface
         if (isset($config['use_current'])) {
             $params = array_merge($params, $_GET);
         }
+
+        // Допустима передача произвольтного url для использовании в строительстве.
+        if (isset($config['url'])) {
+            $delimiterForParams = '&';
+            $urlParts = parse_url($config['url']);
+
+            // Есть GET строка
+            if ($urlParts['query']) {
+                $paramsList = explode($delimiterForParams, $urlParts['query']);
+                $paramsWasInUrl = [];
+                // Извлекаем параметры из GET строки
+                array_walk($paramsList, function ($value, $key) use (&$paramsWasInUrl) {
+                    $parts = explode('=', $value);
+                    if (isset($parts[1])) {
+                        $paramsWasInUrl[$parts[0]] = $parts[1];
+                    }
+                });
+                // Наклыдываем на набор текущий параметров (ежели был указан use_current)
+                // полученные из GET строки параметры
+                $params = array_merge($params, $paramsWasInUrl);
+            }
+        }
+
+
         if (isset($config['delete_params'])) {
+            // При задании единственного
+            if (!is_array($config['delete_params'])) {
+                $config['delete_params'] = [$config['delete_params']];
+            }
+
             foreach ($config['delete_params'] as $run) {
                 unset($params[$run]);
             }

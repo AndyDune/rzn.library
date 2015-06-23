@@ -15,7 +15,7 @@ interface FactoryInterface
     /**
      * Создает сервис.
      *
-     * @param \Rzn\Library\ServiceManager $serviceLocator
+     * @param ServiceManager $serviceLocator
      * @return mixed
      */
     public function createService($serviceLocator);

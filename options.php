@@ -1,41 +1,72 @@
-<?if(!$USER->IsAdmin()) return;
+<?php
+/** @file
+ *
+ *
+ * Подготовка настроек для модуля(библиотеки) в админпанели битрикса
+ *
+ * <strong>Этот файл автоматически подключается битриксом</strong>
+ *
+ * Настройки -> Настройки продукта -> Настройки модулей -> <Имя модуля>
+ * для этой библиотеки Имя модуля = Хорошие библиотеки.
+ *
+ * @package rzn.library
+ * @author Andy Dune
+ * @param string $page
+ */
+
+//Просто проверка, что пользователь имеет административные права
+if(!$USER->IsAdmin()) return;
+
+
 
 IncludeModuleLangFile(__FILE__);
 
+
 CModule::IncludeModule('rzn.library');
 
-$page = Rzn\Library\Registry::getInstance()->getGlobal('APPLICATION')->GetCurPage() . '?mid=' . urlencode($mid) . '&amp;lang=' . LANGUAGE_ID;
+/** @var string $page url текущей страницы + параметры. */
+$page =
+    Rzn\Library\Registry::getInstance()->getGlobal('APPLICATION')->GetCurPage() . '?mid=' . urlencode($mid) . '&amp;lang=' . LANGUAGE_ID;
 
-if(isset($_POST["save"]) && check_bitrix_sessid())
-{
-    $class_prefix = trim($_POST['class_prefix'], '\\ ');
-    $parts = explode('\\', $class_prefix);
-    foreach($parts as $key => $value)
-    {
-        $parts[$key] = ucfirst($value);
+    if(isset($_POST["save"]) && check_bitrix_sessid()) {
+
+        $class_prefix = trim($_POST['class_prefix'], '\\ ');
+        $parts = explode('\\', $class_prefix);
+        foreach($parts as $key => $value)
+        {
+            $parts[$key] = ucfirst($value);
+        }
+        $class_prefix = implode('\\', $parts) . '\\';
+        COption::SetOptionString("rzn.library", "autoload_class_prefix", $class_prefix);
+        $class_folder = trim($_POST['class_folder'], '/ ');
+        COption::SetOptionString("rzn.library", "autoload_class_folder", $class_folder);
+
+        if (isset($_POST['class_is_helpers']) and $_POST['class_is_helpers'] == 'Y')
+            COption::SetOptionString("rzn.library", "class_is_helpers", 'Y');
+        else
+            COption::SetOptionString("rzn.library", "class_is_helpers", 'N');
+
+        LocalRedirect($page);
     }
-    $class_prefix = implode('\\', $parts) . '\\';
-    COption::SetOptionString("rzn.library", "autoload_class_prefix", $class_prefix);
-    $class_folder = trim($_POST['class_folder'], '/ ');
-    COption::SetOptionString("rzn.library", "autoload_class_folder", $class_folder);
 
-    if (isset($_POST['class_is_helpers']) and $_POST['class_is_helpers'] == 'Y')
-        COption::SetOptionString("rzn.library", "class_is_helpers", 'Y');
-    else
-        COption::SetOptionString("rzn.library", "class_is_helpers", 'N');
+$class_prefix =
+    COption::GetOptionString("rzn.library", "autoload_class_prefix");
 
-    LocalRedirect($page);
-}
-
-$class_prefix = COption::GetOptionString("rzn.library", "autoload_class_prefix");
-$class_folder = COption::GetOptionString("rzn.library", "autoload_class_folder");
+    $class_folder
+        = COption::GetOptionString("rzn.library", "autoload_class_folder"); /**< Detailed description after the member */
 
 $class_is_helpers = COption::GetOptionString("rzn.library", "class_is_helpers");
 
 $aTabs = array(
 	array("DIV" => "rzn_library_tab1", "TAB" => GetMessage("RZN_SETTINGS"), "ICON" => "settings", "TITLE" => GetMessage("RZN_LIBRARY_TITLE")),
 );
-$tabControl = new CAdminTabControl("tabControl", $aTabs);
+/**
+ * Создается вкладка в админпанели.
+ *
+ * @var $tabControl CAdminTabControl
+ */
+$tabControl
+    = new CAdminTabControl("tabControl", $aTabs);
 
 $tabControl->Begin();
 ?>

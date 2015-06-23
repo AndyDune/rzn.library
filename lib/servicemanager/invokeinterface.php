@@ -13,9 +13,9 @@ namespace Rzn\Library\ServiceManager;
 interface InvokeInterface {
 
     /**
-     * При выхове сервиса (ПЕРВОМ И ПОСЛЕДУЮЩИХ) запускается этот метод.
+     * При вызове сервиса (ПЕРВОМ И ПОСЛЕДУЮЩИХ) запускается этот метод.
      *
-     * @param \Rzn\Library\ServiceManager $serviceLocator
+     * @param ServiceManager $serviceLocator
      * @return mixed
      */
     public function invoke($serviceManager);

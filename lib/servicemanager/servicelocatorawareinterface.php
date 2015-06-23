@@ -8,8 +8,6 @@
  */
 
 namespace Rzn\Library\ServiceManager;
-use Rzn\Library\ServiceManager\ServiceLocatorInterface;
-
 
 interface ServiceLocatorAwareInterface {
     /**

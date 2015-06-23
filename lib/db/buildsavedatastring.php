@@ -120,6 +120,29 @@ class BuildSaveDataString
                             $quote = false;
                             $value = (int)$value;
                             break;
+                        case 'decimal':
+                            $quote = false;
+                            $value = $value;
+
+                            $value = str_replace(',', '.', $value);
+                            $value = preg_replace('|[^.\d]|', '', $value);
+                            $value = preg_replace('|\.+|', '.', $value);
+                            $parts = explode('.', $value);
+                            $parts = array_slice($parts, 0, 2);
+
+                            // Ограничиваем кол-во цифр до точки
+                            if (isset($config[$key]['len'][0])) {
+                                $parts[0] = substr($parts[0], 0, $config[$key]['len'][0]);
+                            }
+
+                            // Ограничиваем кол-во цифр после точки
+                            if (isset($parts[1]) and isset($config[$key]['len'][1])) {
+                                $parts[1] = substr($parts[1], 0, $config[$key]['len'][1]);
+                            }
+
+                            $value = implode('.', $parts);
+                            break;
+
                         case 'array':
                             if (is_array($value))
                                 $value = serialize($value);

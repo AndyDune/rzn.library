@@ -5,29 +5,44 @@
  * | Сайт: www.rznw.ru                                 |
  * | Телефон: +7 (4912) 51-10-23                       |
  * ----------------------------------------------------
+ *
+ * Отложенная инициилизация для сервисов и хелперов.
+ * Этот механизмус полностью заменен инициилизаторами.
  */
 
 namespace Rzn\Library\ServiceManager;
 
-
+/**
+ * @deprecated
+ * Class LazyConfig
+ * @package Rzn\Library\ServiceManager
+ */
 class LazyConfig implements InitializerInterface
 {
     /**
-     * @var \Rzn\Library\ServiceManager
+     * @var ServiceManager
      */
     protected $sm;
 
     protected $setters = array();
 
     /**
-     * @param \Rzn\Library\ServiceManager $sm
+     * @param ServiceManager $sm
      */
-    public function __construct(\Rzn\Library\ServiceManager $sm)
+    public function __construct(ServiceManager $sm)
     {
         $this->sm = $sm;
     }
 
 
+    /**
+     * Введена возможность
+     *
+     * @param $class Имя класса или имя зарегистрированного сериса.
+     * @param $method
+     * @param $params
+     * @return $this
+     */
     public function addSetter($class, $method, $params)
     {
         if (!array_key_exists($class, $this->setters)) {
@@ -37,22 +52,20 @@ class LazyConfig implements InitializerInterface
         return $this;
     }
 
-    public function initialize($object)
+    public function initialize($object, $name)
     {
         if (!is_object($object))
             return false;
 
-        $class = get_class($object);
-/*
-        pr($class);
-        if ($class == 'Rzn\Library\Component\HelperManager') {
-            pr($this->setters);
-            die();
+        // Ключ для поздней загрузки может быть не только имя класса, но и имя сервиса.
+        // Не алиаса!
+        if ($name and array_key_exists($name, $this->setters)) {
+            $class = $name;
+        } else {
+            $class = get_class($object);
+            if (!array_key_exists($class, $this->setters))
+                return true;
         }
-*/
-
-        if (!array_key_exists($class, $this->setters))
-            return true;
         foreach($this->setters[$class] as $setter) {
             $method = $setter['method'];
             $params = $setter['params'];

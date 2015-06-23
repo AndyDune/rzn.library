@@ -157,6 +157,7 @@ class Session implements \Iterator, \ArrayAccess, \Countable, InvokeInterface
     {
         $this->_canEditZone();
         unset($_SESSION[$this->_usingZone]);
+        return $this;
     }
     
     /**
@@ -166,6 +167,7 @@ class Session implements \Iterator, \ArrayAccess, \Countable, InvokeInterface
     {
         $this->_canEditZone();
         $_SESSION[$this->_usingZone] = array();
+        return $this;
     }
 
     
@@ -203,6 +205,14 @@ class Session implements \Iterator, \ArrayAccess, \Countable, InvokeInterface
         if ($array_container)
             return new \Rzn\Library\ArrayContainer($_SESSION[$this->_usingZone]);
         return $_SESSION[$this->_usingZone];
+    }
+
+    /**
+     * Псевдоним функции getZone
+     */
+    public function getArrayCopy($array_container = false)
+    {
+        return $this->getZone($array_container);
     }
 
     /**

@@ -11,5 +11,5 @@ namespace Rzn\Library\ServiceManager;
 
 
 interface InitializerInterface {
-    public function initialize($object);
+    public function initialize($object, $name);
 } 

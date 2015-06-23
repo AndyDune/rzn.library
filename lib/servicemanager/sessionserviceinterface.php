@@ -22,5 +22,5 @@ interface SessionServiceInterface
      * @param $service
      * @return \Rzn\Library\Session
      */
-    public function getSessionService($service);
+    public function getSessionService();
 } 

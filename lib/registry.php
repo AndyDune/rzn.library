@@ -21,6 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
+ * Хранилище объектов
+ *
+ *
  * @package     rzn.library
  * @author      Andrey Ryzhov <info@rznw.ru>
  * @copyright   2014 Andrey Ryzhov.
@@ -29,6 +32,8 @@
  */
 
 namespace Rzn\Library;
+use Rzn\Library\Service\ApplicationContainer;
+
 class Registry extends \ArrayObject
 {
 
@@ -49,7 +54,7 @@ class Registry extends \ArrayObject
     /**
      * Менеджер сервисов сайта.
      *
-     * @var ServiceManager
+     * @var ServiceManager\ServiceManager
      */
     private static $_sm = null;
 
@@ -87,7 +92,7 @@ class Registry extends \ArrayObject
     public static function getServiceManager()
     {
         if (!self::$_sm)
-            self::$_sm = new ServiceManager();
+            self::$_sm = new ServiceManager\ServiceManager();
         return self::$_sm;
     }
 
@@ -158,16 +163,22 @@ class Registry extends \ArrayObject
         return $USER;
     }
 
+    protected static $applicationContainer = null;
     /**
      * Возвращает самый важный объект
      *
      * @return \CMain
      */
-    public static function getApplication()
+    public static function getApplication($inContainer = true)
     {
-        // @return \Bitrix\Main\Application
-        return $GLOBALS['APPLICATION'];
-        //return \Bitrix\Main\Application::getInstance();
+        if (!$inContainer) {
+            return $GLOBALS['APPLICATION'];
+            //return \Bitrix\Main\Application::getInstance();
+        }
+        if (!static::$applicationContainer) {
+            static::$applicationContainer = new ApplicationContainer($GLOBALS['APPLICATION']);
+        }
+        return static::$applicationContainer;
     }
 
 

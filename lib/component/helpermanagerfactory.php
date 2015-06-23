@@ -12,20 +12,25 @@
 
 namespace Rzn\Library\Component;
 
+use Rzn\Library\Registry;
 use Rzn\Library\ServiceManager\FactoryInterface;
 
 class HelperManagerFactory implements FactoryInterface
 {
+    /**
+     * @param \Rzn\Library\ServiceManager\ServiceManager $serviceLocator
+     * @param null $name
+     * @return mixed|HelperManager
+     */
     public function createService($serviceLocator, $name = null)
     {
         $object = new HelperManager();
-        $object->setInvokableClass('url', 'Rzn\Library\Component\Helper\Url');
-        $object->setInvokableClass('isAjax', 'Rzn\Library\Component\Helper\IsAjax');
-        $object->setInvokableClass('getFileArray', 'Rzn\Library\Component\Helper\GetFileArray');
-        $object->setInvokableClass('printOuterLink', 'Rzn\Library\Component\Helper\printOuterLink');
-        $object->setInvokableClass('truncateHtml', 'Rzn\Library\Component\Helper\TruncateHtml');
+        $config = $serviceLocator->get('config');
+        if (isset($config['view_helpers'])) {
+            $object->setConfig($config['view_helpers']);
+            $object->initServicesFromConfig($serviceLocator);
+        }
         return $object;
-
     }
 
 }

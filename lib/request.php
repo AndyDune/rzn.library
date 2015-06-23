@@ -23,6 +23,8 @@ class Request
 
     protected $subDomain = '';
 
+    protected $params = [];
+
 
     public function __construct()
     {
@@ -35,6 +37,31 @@ class Request
                 $this->subDomain = $parts[$countParts - 3];
             }
         }
+    }
+
+    public function getParam($param, $default = null)
+    {
+        if (isset($this->params[$param])) {
+            return $this->params[$param];
+        }
+        return $default;
+    }
+
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    public function setParams($params)
+    {
+        $this->params = $params;
+        return $this;
+    }
+
+    public function addParam($param, $value)
+    {
+        $this->params[$param] = $value;
+        return $this;
     }
 
     /**
@@ -93,10 +120,10 @@ class Request
         $subDomain = $this->subDomainQueryParameterName;
         if (isset($_GET[$subDomain]) and $_GET[$subDomain]) {
             $subDomain = $_GET[$subDomain];
-            $this->subDomain = 'query';
-        } else if (isset($_POST[$subDomain]) and $_POST[$subDomain]) {
+            $this->subDomainHolder = 'query';
+        } else if (0 and isset($_POST[$subDomain]) and $_POST[$subDomain]) { // В post не ищем
             $subDomain = $_POST[$subDomain];
-            $this->subDomain = 'query';
+            $this->subDomainHolder = 'query';
         } else {
             $subDomain = '';
         }
@@ -135,5 +162,41 @@ class Request
         return $this->subDomainQueryParameterName;
     }
 
+
+    /**
+     * Возвращает все post параметры или только один указанный.
+     *
+     * @param string $param Название параметра или null если нужно выбрать все.
+     * @param mixed $default Значение по-умолчанию
+     * @return mixed
+     */
+    public function fromPost($param = null, $default = null)
+    {
+        if ($param === null) {
+            return $_POST;
+        }
+        if (isset($_POST[$param])) {
+            return $_POST[$param];
+        }
+        return $default;
+    }
+
+    /**
+     * Возвращает все параметры из строки запроса или только один указанный.
+     *
+     * @param string $param Название параметра или null если нужно выбрать все.
+     * @param mixed $default Значение по-умолчанию
+     * @return mixed
+     */
+    public function fromQuery($param = null, $default = null)
+    {
+        if ($param === null) {
+            return $_GET;
+        }
+        if (isset($_GET[$param])) {
+            return $_GET[$param];
+        }
+        return $default;
+    }
 
 } 

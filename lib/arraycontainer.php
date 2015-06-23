@@ -43,6 +43,8 @@ class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
     protected $_arraySourse = array();
     protected $_defaultValue = null;
 
+    protected $_filters = [];
+
     /**
      * @param $array целевой масив
      * @param null $defaultValue значение по-умолчанию
@@ -51,6 +53,15 @@ class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
     public function __construct($array= null, $defaultValue = null, $nested = false)
     {
         $this->init($array, $defaultValue, $nested);
+    }
+
+    public function addFilter($function)
+    {
+        if (!is_callable($function)) {
+            throw new Exception('В качестве фильтра должна быть указана анонимная функция');
+        }
+        $this->_filters[] = $function;
+        return $this;
     }
 
     public function init($array, $defaultValue = null, $nested = false)
@@ -72,6 +83,7 @@ class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
         }
         return $this;
     }
+
     /**
      * Возвращает колличество элементов массива
      * Реализует интрефейс Countable
@@ -188,6 +200,14 @@ class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
         return $array;
     }
 
+    protected function _filter($value, $name)
+    {
+        foreach($this->_filters as $filter) {
+            $value = $filter($value, $name);
+        }
+        return $value;
+    }
+
 ////////////////////////////////////////////////////////////////
 ///////////////////////////////     Магические методы
     public function __set($name, $value)
@@ -197,7 +217,7 @@ class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
     public function __get($name)
     {
         if (isset($this->_array[$name]))
-            return $this->_array[$name];
+            return $this->_filter($this->_array[$name], $name);
         else
             return $this->_defaultValue;
     }
@@ -224,9 +244,10 @@ class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
     public function offsetGet($key)
     {
         if (isset($this->_array[$key]))
-            return $this->_array[$key];
+            return $this->_filter($this->_array[$key], $key);
         else
             return $this->_defaultValue;
+
     }
 
     public function offsetSet($key, $value)
@@ -248,7 +269,7 @@ class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
     // возвращает текущий элемент
     public function current()
     {
-        return current($this->_array);
+        return $this->_filter(current($this->_array), key($this->_array));
     }
     // возвращает ключ текущего элемента
     public function key()

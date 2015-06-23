@@ -23,9 +23,9 @@
 */
 
 namespace Rzn\Library\Format;
+use ArrayAccess;
 
-
-class ArrayModification
+class ArrayModification implements ArrayAccess
 {
     protected $array = [];
 
@@ -69,13 +69,13 @@ class ArrayModification
         foreach($this->filtersCallback as $filter) {
             if ($filter['keys']) {
                 foreach($filter['keys'] as $key) {
-                    if (isset($this->array[$key])) {
-                        $this->array[$key] = $filter['function']($this->array[$key]);
+                    if (array_key_exists($key, $this->array)) {
+                        $this->array[$key] = $filter['function']($this->array[$key], $key);
                     }
                 }
             } else {
                 foreach ($this->array as $key => $value) {
-                    $this->array[$key] = $filter['function']($value);
+                    $this->array[$key] = $filter['function']($value, $key);
                 }
             }
         }
@@ -86,7 +86,7 @@ class ArrayModification
      * Оставить в массиве значения только с указанными ключами.
      *
      * @param array $keys массив ключей, которые надо оставить в массиве
-     * @return array
+     * @return $this
      */
     public function keysLeave($keys)
     {
@@ -121,6 +121,11 @@ class ArrayModification
         return $this;
     }
 
+    /**
+     * @param $keys
+     * @param null $default
+     * @return $this
+     */
     function keysAddIfNotExist($keys, $default = null)
     {
         $array = $this->array;
@@ -135,14 +140,43 @@ class ArrayModification
         return $this;
     }
 
-    function keysIntVal($keys)
+    /**
+     * Переименование ключей в массиве.
+     *
+     * @param array $data массив типа <старый существующий ключ> => <новый ключ>
+     * @return $this
+     */
+    public function keysRename(array $data)
+    {
+        $arrayResult = [];
+        foreach($this->array as $key => $value) {
+            if (array_key_exists($key, $data)) {
+                $arrayResult[$data[$key]] = $value;
+            } else {
+                $arrayResult[$key] = $value;
+            }
+        }
+        $this->array = $arrayResult;
+        return $this;
+    }
+
+    /**
+     * @param $keys
+     * @return $this
+     */
+    function keysIntVal($keys = null)
     {
         $array = $this->array;
-        if (!is_array($keys))
+        if ($keys == '*') {
+            $keys = null;
+        }
+
+        if ($keys and !is_array($keys)) {
             $keys = array($keys);
+        }
         $result = array();
         foreach($array as $key => $value) {
-            if (in_array($key, $keys)) {
+            if (!$keys or in_array($key, $keys)) {
                 $result[$key] = intval($value);
             } else {
                 $result[$key] = $value;
@@ -152,14 +186,21 @@ class ArrayModification
         return $this;
     }
 
-    function keysTrim($keys)
+    /**
+     * @param null $keys
+     * @return $this
+     */
+    function keysTrim($keys = null)
     {
         $array = $this->array;
-        if (!is_array($keys))
+        if ($keys == '*') {
+            $keys = null;
+        }
+        if ($keys and !is_array($keys))
             $keys = array($keys);
         $result = array();
         foreach($array as $key => $value) {
-            if (in_array($key, $keys)) {
+            if (!$keys or in_array($key, $keys)) {
                 $result[$key] = trim($value);
             } else {
                 $result[$key] = $value;
@@ -169,7 +210,10 @@ class ArrayModification
         return $this;
     }
 
-
+    /**
+     * @param $keys
+     * @return $this
+     */
     function keysDoubleVal($keys)
     {
         $array = $this->array;
@@ -185,6 +229,35 @@ class ArrayModification
         }
         $this->array = $result;
         return $this;
+    }
+    ////////////////////////////////////////////////////////////////
+///////////////////////////////     Методы интерфейса ArrayAccess
+    /**
+     * @param mixed $key
+     * @return mixed
+     * @access private
+     */
+    public function offsetExists($key)
+    {
+        return isset($this->array[$key]);
+    }
+
+    public function offsetGet($key)
+    {
+        if (isset($this->array[$key])) {
+            return $this->array[$key];
+        }
+        return null;
+    }
+
+    public function offsetSet($key, $value)
+    {
+        $this->array[$key] = $value;
+    }
+
+    public function offsetUnset($key)
+    {
+        unset($this->array[$key]);
     }
 
 } 
