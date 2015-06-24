@@ -177,7 +177,7 @@ class ArrayModification implements ArrayAccess
         $result = array();
         foreach($array as $key => $value) {
             if (!$keys or in_array($key, $keys)) {
-                $result[$key] = intval($value);
+                $result[$key] = (int)str_replace(' ', '', $value);
             } else {
                 $result[$key] = $value;
             }
@@ -187,6 +187,51 @@ class ArrayModification implements ArrayAccess
     }
 
     /**
+     * Преобразование данных под указанными ключами в дробное число.
+     *
+     * @param null|string|array $keys список ключей, которые модифицировать надо
+     * @param null $config
+     * @return $this
+     */
+    public function keysNumber($keys = null, $config = null)
+    {
+        $array = $this->array;
+        if ($keys == '*') {
+            $keys = null;
+        }
+
+        if ($keys and !is_array($keys)) {
+            $keys = array($keys);
+        }
+        $result = array();
+        foreach($array as $key => $value) {
+            if ($keys and !in_array($key, $keys)) {
+                $result[$key] = $value;
+                continue;
+            }
+            $value = str_replace(',', '.', $value);
+            $value = preg_replace('|[^.\d]|', '', $value);
+            $value = preg_replace('|\.+|', '.', $value);
+            $parts = explode('.', $value);
+            $parts = array_slice($parts, 0, 2);
+
+            // Ограничиваем кол-во цифр до точки
+            if (isset($parts[0]) and isset($config[0])) {
+                $parts[0] = substr($parts[0], 0, $config[0]);
+            }
+
+            // Ограничиваем кол-во цифр после точки
+            if (isset($parts[1]) and isset($config[1])) {
+                $parts[1] = substr($parts[1], 0, $config[1]);
+            }
+            $value = implode('.', $parts);
+            $result[$key] = $value;
+        }
+        $this->array = $result;
+        return $this;
+    }
+
+/**
      * @param null $keys
      * @return $this
      */
