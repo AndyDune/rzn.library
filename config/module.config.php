@@ -75,6 +75,28 @@ return array(
         )
     ),
 
+    'di' => [
+        'handlers' => [
+            'setter' => ['invokable' => 'Rzn\Library\Di\Handler\Setter', 'config' => 'di.setters'],
+            'initializer' => ['invokable' => 'Rzn\Library\Di\Handler\Initializer', 'config' => 'di.initializers'],
+        ],
+        'initializers' => [
+            'Rzn\Library\ServiceManager\InterfaceInitializer'
+            , 'Rzn\Library\EventManager\Initializer'
+            , 'Rzn\Library\ServiceManager\Initializer\CookieService'
+            , 'Rzn\Library\ServiceManager\Initializer\ConfigService'
+            , 'Rzn\Library\ServiceManager\Initializer\EventManager'
+            , 'Rzn\Library\ServiceManager\Initializer\CompletionTasks'
+            , 'Rzn\Library\Mediator\Initializer'
+            , 'Rzn\Library\Waterfall\Initializer'
+        ],
+        'setters' => [
+            'config' => 'Rzn\Library\Di\Handler\SetterHandler\Config',
+            'invokable' => 'Rzn\Library\Di\Handler\SetterHandler\Invokable',
+            'service' => 'Rzn\Library\Di\Handler\SetterHandler\Service'
+        ]
+
+    ],
 
     'configurable_event_manager' => [
         'listeners' => [
