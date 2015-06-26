@@ -1,11 +1,14 @@
 <?
 $arModuleVersion = array(
-    "VERSION" => "1.13.3",
-    "VERSION_DATE" => "2015-06-24 15:30:00"
+    "VERSION" => "1.14.0",
+    "VERSION_DATE" => "2015-06-26 15:30:00"
 );
 
 
 /**
+ *
+ * 1.14
+ * Добавлен класс Rzn\Library\BitrixTrial\Iblock\GetList\FreeQueryModification
  *
  * 1.13.3
  * Изменена фильтрация для целых чисел - может быть пробел.
