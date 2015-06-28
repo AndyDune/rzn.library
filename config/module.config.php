@@ -77,8 +77,8 @@ return array(
 
     'di' => [
         'handlers' => [
-            'setter' => ['invokable' => 'Rzn\Library\Di\Handler\Setter', 'config' => 'di.setters'],
-            'initializer' => ['invokable' => 'Rzn\Library\Di\Handler\Initializer', 'config' => 'di.initializers'],
+            'setter' => ['invokable' => 'Rzn\Library\Di\Handler\Setter', 'config' => 'di.setters', 'key' => 'setters'],
+            'initializer' => ['invokable' => 'Rzn\Library\Di\Handler\Initializer', 'config' => 'di.initializers', 'key' => 'initializers'],
         ],
         'initializers' => [
             'Rzn\Library\ServiceManager\InterfaceInitializer'

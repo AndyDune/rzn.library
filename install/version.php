@@ -1,11 +1,14 @@
 <?
 $arModuleVersion = array(
-    "VERSION" => "1.14.0",
-    "VERSION_DATE" => "2015-06-26 15:30:00"
+    "VERSION" => "1.14.1",
+    "VERSION_DATE" => "2015-06-28 20:57:00"
 );
 
 
 /**
+ *
+ * 1.14.1
+ * Водопад заработал. Не в идеале.
  *
  * 1.14
  * Добавлен класс Rzn\Library\BitrixTrial\Iblock\GetList\FreeQueryModification

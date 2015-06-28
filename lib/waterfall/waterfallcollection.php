@@ -31,8 +31,9 @@
 namespace Rzn\Library\Waterfall;
 use Rzn\Library\ServiceManager\ServiceLocatorAwareInterface;
 use Rzn\Library\ServiceManager\ServiceLocatorInterface;
+use Rzn\Library\ServiceManager\ConfigServiceAwareInterface;
 
-class WaterfallCollection implements ServiceLocatorAwareInterface
+class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
 {
     protected $serviceManager;
     protected $waterfallsLoaded = [];
@@ -46,38 +47,39 @@ class WaterfallCollection implements ServiceLocatorAwareInterface
      * @param array $params
      * @param null $callback
      */
-    public function execute($name, $params = [], $callback = null)
+    /**
+     * @param $name
+     * @param array $params
+     * @return Result
+     */
+    public function execute($name, $params = [])
     {
         if (!array_key_exists($name, $this->waterfallsLoaded)) {
             $this->waterfallsLoaded[$name] = $this->loadWaterfall($name);
         }
-        $result = $this->waterfallsLoaded[$name]->execute($params);
-        if ($callback and is_callable($callback)) {
-            return $callback($result);
-        }
-        return $result;
+        return $this->waterfallsLoaded[$name]->execute($params);
     }
 
     public function loadWaterfall($name)
     {
         $waterfall = new Waterfall($name);
-
-        if (isset($this->mediatorConfig['stream'][$name])) {
-            $streamDescription = $this->mediatorConfig['stream'][$name];
+        if (isset($this->waterfallConfig['streams'][$name])) {
+            $streamDescription = $this->waterfallConfig['streams'][$name];
+            //pr($streamDescription);
                 foreach($streamDescription['drops'] as $item) {
                     $service = $this->getObjectIfShared($item);
                     $waterfall->addFunction($this->_buildFunction($item, $service, 'drop'));
                 }
-            if (array_key_exists('final', $streamDescription)) {
+            if (isset($streamDescription['final'])) {
                 $item = $streamDescription['final'];
                 $service = $this->getObjectIfShared($item);
-                $waterfall->addFunction($this->_buildFunction($item, $service, 'final'));
+                $waterfall->setFinalFunction($this->_buildFunction($item, $service, 'final'));
 
             }
-            if (array_key_exists('error', $streamDescription)) {
+            if (isset($streamDescription['error'])) {
                 $item = $streamDescription['error'];
                 $service = $this->getObjectIfShared($item);
-                $waterfall->addFunction($this->_buildFunction($item, $service, 'error'));
+                $waterfall->setErrorFunction($this->_buildFunction($item, $service, 'error'));
 
             }
 
@@ -139,6 +141,7 @@ class WaterfallCollection implements ServiceLocatorAwareInterface
      */
     public function setConfigService($service)
     {
+
         if ($service['waterfall']) {
             $this->waterfallConfig = $service['waterfall'];
         }

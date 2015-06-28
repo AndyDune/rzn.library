@@ -12,8 +12,6 @@
 
 namespace Rzn\Library\Waterfall;
 
-
-use Bitrix\Main\Entity\Result;
 use Rzn\Library\Exception;
 
 class Waterfall
@@ -56,12 +54,17 @@ class Waterfall
     }
 
 
+    /**
+     * @param null|array $params
+     * @return Result
+     */
     public function execute($params = null)
     {
         try {
             $err = null;
             /** @var \Rzn\Library\Waterfall\Result $resultObject */
             $resultObject = new Result();
+            //pr($this->functions);
             foreach ($this->functions as $function) {
                 $resultObject->reset();
                 $function($params, $resultObject);
@@ -75,15 +78,15 @@ class Waterfall
                 if ($func = $this->getErrorFunction()) {
                     $resultObject->reset();
                     $func($params, $resultObject);
-                    return $resultObject->getResults();
+                    return $resultObject;
                 }
             }
             if ($func = $this->getFinalFunction()) {
                 $resultObject->reset();
                 $func($params, $resultObject);
-                return $resultObject->getResults();
+                return $resultObject;
             }
-            return $params;
+            return $resultObject;
         } catch(Exception $e) {
             // todo добавить действия на ошибки самого водопада
         }
