@@ -87,7 +87,7 @@ class Registry extends \ArrayObject
     /**
      * Возвращает менеджер сервисов.
      *
-     * @return ServiceManager
+     * @return \Rzn\Library\ServiceManager\ServiceManager
      */
     public static function getServiceManager()
     {

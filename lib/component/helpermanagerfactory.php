@@ -28,7 +28,6 @@ class HelperManagerFactory implements FactoryInterface
         $config = $serviceLocator->get('config');
         if (isset($config['view_helpers'])) {
             $object->setConfig($config['view_helpers']);
-            $object->initServicesFromConfig($serviceLocator);
         }
         return $object;
     }

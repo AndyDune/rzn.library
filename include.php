@@ -81,6 +81,8 @@ $config->addModule('rzn.library');
 
 $sm = Registry::getServiceManager();
 $sm->setService('config', $config);
+// Сам у себя менеджер сервисов
+$sm->setServiceLocator($sm);
 
 // Внедрение инициилизатора перенесено в конфиг local/modules/rzn.library/config/module.config.php (39)
 //$sm->addInitializer(new \Rzn\Library\ServiceManager\InterfaceInitializer($sm));

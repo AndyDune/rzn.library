@@ -12,7 +12,7 @@ use Rzn\Library\Exception;
 use Rzn\Library\ServiceManager\ServiceLocatorAwareInterface;
 use Rzn\Library\ServiceManager\ServiceLocatorInterface;
 
-class HelperManager extends ServiceManager implements ServiceLocatorAwareInterface
+class HelperManager extends ServiceManager
 {
 
     /**
@@ -40,68 +40,6 @@ class HelperManager extends ServiceManager implements ServiceLocatorAwareInterfa
     {
 
     }
-
-
-
-    /**
-     * Инициилизация сервисов из массива с конфигом.
-     * Инициилизация этого сервоса из конфига происходит раньше внедрения в него менеджера сервисов.
-     * Для этого передаем методу менеджер сервисов из фабрики.
-     * todo протестировать возможногсть удаления этого метода.
-     *
-     * @return $this
-     */
-    public function initServicesFromConfig_toRemove(ServiceLocatorInterface $serviceLocator)
-    {
-        //echo '<p>initServicesFromConfig</p>';
-        $config = $this->getConfig();
-        if (isset($config['invokables'])) {
-            foreach($config['invokables'] as $key => $value) {
-                $this->setInvokableClass($key, $value);
-            }
-        }
-
-        if (isset($config['factories'])) {
-            foreach($config['factories'] as $key => $value) {
-                $this->setFactory($key, $value);
-            }
-        }
-
-        if (isset($config['aliases'])) {
-            foreach($config['aliases'] as $key => $value) {
-                $this->setAlias($key, $value);
-            }
-        }
-
-        if (isset($config['initializers'])) {
-            foreach($config['initializers'] as $key => $value) {
-                $initializer = new $value();
-                if ($initializer instanceof ServiceLocatorAwareInterface) {
-                    $initializer->setServiceLocator($serviceLocator);
-                }
-                $this->addInitializer($initializer);
-            }
-        }
-        return $this;
-    }
-
-
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
-    {
-        $this->serviceLocator = $serviceLocator;
-        return $this;
-    }
-
-    /**
-     * Возврат сервис локатора.
-     *
-     * @return ServiceLocatorInterface
-     */
-    public function getServiceLocator()
-    {
-        return $this->serviceLocator;
-    }
-
 
     public function __call($name, $params = null)
     {

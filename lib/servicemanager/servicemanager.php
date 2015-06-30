@@ -39,13 +39,15 @@ use Rzn\Library\Config;
 use Rzn\Library\Exception;
 
 
-class ServiceManager implements ServiceLocatorInterface
+class ServiceManager implements ServiceLocatorInterface, ServiceLocatorAwareInterface
 {
     protected $instances = array();
 
     protected $factories = array();
 
     protected $invokableClasses = array();
+
+    protected $serviceLocator;
 
     /**
      * Зафиксированные сервисы.
@@ -96,6 +98,9 @@ class ServiceManager implements ServiceLocatorInterface
     protected $configObject = null;
 
     protected $servicesInitDone = false;
+
+
+    protected $initConfigMade = false;
 
 
     /**
@@ -247,6 +252,10 @@ class ServiceManager implements ServiceLocatorInterface
      */
     public function get($name)
     {
+        if (!$this->initConfigMade) {
+            $this->initConfigMade = true;
+            $this->initServicesFromConfig();
+        }
         // inlined code from ServiceManager::canonicalizeName for performance
         if (isset($this->canonicalNames[$name])) {
             $cName = $this->canonicalNames[$name];
@@ -338,6 +347,11 @@ class ServiceManager implements ServiceLocatorInterface
      */
     public function has($name, $checkAbstractFactories = true, $usePeeringServiceManagers = true)
     {
+        if (!$this->initConfigMade) {
+            $this->initConfigMade = true;
+            $this->initServicesFromConfig();
+        }
+
         if (is_array($name)) {
             list($cName, $rName) = $name;
         } else {
@@ -556,6 +570,12 @@ class ServiceManager implements ServiceLocatorInterface
         );
     }
 
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->serviceLocator = $serviceLocator;
+        return $this;
+    }
+
     /**
      * Возврат сервис локатора.
      *
@@ -563,7 +583,7 @@ class ServiceManager implements ServiceLocatorInterface
      */
     public function getServiceLocator()
     {
-        return $this;
+        return $this->serviceLocator;
     }
 
     /**
