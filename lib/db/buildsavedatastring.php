@@ -141,6 +141,9 @@ class BuildSaveDataString
                             }
 
                             $value = implode('.', $parts);
+                            if (!$value) {
+                                $value = 0;
+                            }
                             break;
 
                         case 'array':

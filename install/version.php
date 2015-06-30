@@ -1,11 +1,15 @@
 <?
 $arModuleVersion = array(
-    "VERSION" => "1.15.2",
-    "VERSION_DATE" => "2015-06-30 14:57:00"
+    "VERSION" => "1.15.3",
+    "VERSION_DATE" => "2015-06-30 17:57:00"
 );
 
 
 /**
+ *
+ * 1.15.3
+ * Устранена ошибка в строителе запросов CatalogElementFreeProperty для данных decimal
+ * Добавлен отдельный автозагрузчик для Zend классов
  *
  * 1.15.2
  * Класс Rzn\Library\Component\HelperManager не используется.
