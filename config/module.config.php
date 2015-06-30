@@ -51,6 +51,21 @@ return array(
     ),
     'view_helpers' => array (
         'invokables' => array(
+
+            'ajaxbehavior'                 => 'Rzn\Library\Component\Helper\AjaxBehavior',
+            'arrayextractvalueswithprefix' => 'Rzn\Library\Component\Helper\ArrayExtractValuesWithPrefix',
+            'drawimage'                    => 'Rzn\Library\Component\Helper\DrawImage',
+            'drawmaxdimensionforimage'     => 'Rzn\Library\Component\Helper\DrawMaxDimensionForImage',
+            'firstexistvalueinarray'       => 'Rzn\Library\Component\Helper\FirstExistValueInArray',
+            'getiblockelementpropertyvaluewithcode' => 'Rzn\Library\Component\Helper\GetIblockElementPropertyValueWithCode',
+            'getorderpropertywithcode'              => 'Rzn\Library\Component\Helper\GetOrderPropertyWithCode',
+            'insertimages'         => 'Rzn\Library\Component\Helper\InsertImages',
+            'pluralform'           => 'Rzn\Library\Component\Helper\PluralForm',
+            'pr'                   => 'Rzn\Library\Component\Helper\Pr',
+            'showerror'            => 'Rzn\Library\Component\Helper\ShowError',
+            'shownote'             => 'Rzn\Library\Component\Helper\ShowNote',
+            'stringwithwhitespace' => 'Rzn\Library\Component\Helper\StringWithWhiteSpace',
+
             'url' => 'Rzn\Library\Component\Helper\Url',
             'isAjax' => 'Rzn\Library\Component\Helper\IsAjax',
             'getFileArray' => 'Rzn\Library\Component\Helper\GetFileArray',

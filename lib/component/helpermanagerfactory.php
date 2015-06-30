@@ -14,6 +14,7 @@ namespace Rzn\Library\Component;
 
 use Rzn\Library\Registry;
 use Rzn\Library\ServiceManager\FactoryInterface;
+use Rzn\Library\ServiceManager\ServiceManager;
 
 class HelperManagerFactory implements FactoryInterface
 {
@@ -24,7 +25,7 @@ class HelperManagerFactory implements FactoryInterface
      */
     public function createService($serviceLocator, $name = null)
     {
-        $object = new HelperManager();
+        $object = new ServiceManager();
         $config = $serviceLocator->get('config');
         if (isset($config['view_helpers'])) {
             $object->setConfig($config['view_helpers']);

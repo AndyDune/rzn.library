@@ -771,6 +771,28 @@ class ServiceManager implements ServiceLocatorInterface, ServiceLocatorAwareInte
         }
     }
 
+
+    public function __call($name, $params = null)
+    {
+        if ($this->has($name))
+        {
+            $helper = $this->get($name);
+            if (is_callable($helper))
+                return call_user_func_array($helper, $params);
+            return $helper;
+        }
+        $serviceManager = $this->getServiceLocator();
+        if (!$serviceManager->has($name))
+            throw new Exception('Сервис с именем ' . $name . ' не зарегистрирован.');
+
+        $helper = $serviceManager->get($name);
+        if (is_callable($helper))
+            return call_user_func_array($helper, $params);
+        return $helper;
+
+    }
+
+
     /**
      * Возвращает справочную информацию о зарегистрированных хелперах.
      * @return string
