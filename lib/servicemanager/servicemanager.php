@@ -136,7 +136,11 @@ class ServiceManager implements ServiceLocatorInterface
                     if (isset($value['shared'])) {
                         $shared = $value['shared'];
                     }
-                    $value = $value[0];
+                    if (isset($value['name'])) {
+                        $value = $value['name'];
+                    } else {
+                        $value = $value[0];
+                    }
                 }
                 $this->setInvokableClass($key, $value);
                 // Уставновка shared возможна только после внедрения самого сервиса.
@@ -153,7 +157,11 @@ class ServiceManager implements ServiceLocatorInterface
                     if (isset($value['shared'])) {
                         $shared = $value['shared'];
                     }
-                    $value = $value[0];
+                    if (isset($value['name'])) {
+                        $value = $value['name'];
+                    } else {
+                        $value = $value[0];
+                    }
                 }
                 $this->setFactory($key, $value);
                 // Уставновка shared возможна только после внедрения самого сервиса.

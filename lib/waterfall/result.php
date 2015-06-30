@@ -75,6 +75,9 @@ class Result implements ArrayAccess
     }
 
 
+    /**
+     * @return Error
+     */
     public function getError()
     {
         return $this->error;

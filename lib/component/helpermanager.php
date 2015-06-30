@@ -47,10 +47,11 @@ class HelperManager extends ServiceManager implements ServiceLocatorAwareInterfa
      * Инициилизация сервисов из массива с конфигом.
      * Инициилизация этого сервоса из конфига происходит раньше внедрения в него менеджера сервисов.
      * Для этого передаем методу менеджер сервисов из фабрики.
+     * todo протестировать возможногсть удаления этого метода.
      *
      * @return $this
      */
-    public function initServicesFromConfig(ServiceLocatorInterface $serviceLocator)
+    public function initServicesFromConfig_toRemove(ServiceLocatorInterface $serviceLocator)
     {
         //echo '<p>initServicesFromConfig</p>';
         $config = $this->getConfig();
