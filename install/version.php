@@ -1,11 +1,14 @@
 <?
 $arModuleVersion = array(
-    "VERSION" => "1.15.3",
-    "VERSION_DATE" => "2015-06-30 17:57:00"
+    "VERSION" => "1.15.4",
+    "VERSION_DATE" => "2015-07-01 15:07:00"
 );
 
 
 /**
+ *
+ * 1.15.4
+ * Вернут карту классов Zend
  *
  * 1.15.3
  * Устранена ошибка в строителе запросов CatalogElementFreeProperty для данных decimal

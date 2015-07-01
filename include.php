@@ -41,7 +41,7 @@ CModule::AddAutoloadClasses(
     array(
         'Rzn\Library\Loader' => 'lib/loader.php',
         'Rzn\Library\Registry' => 'lib/registry.php',
-        /*
+
                 'Zend\Stdlib\MessageInterface'    => 'vendor/zendframework/library/Zend/Stdlib/MessageInterface.php',
                 'Zend\Stdlib\Message'             => 'vendor/zendframework/library/Zend/Stdlib/Message.php',
                 'Zend\Stdlib\Parameters'          => 'vendor/zendframework/library/Zend/Stdlib/Parameters.php',
@@ -93,12 +93,9 @@ CModule::AddAutoloadClasses(
         //        'Zend\EventManager\'   => 'vendor/zendframework/library/Zend/EventManager/.php',
                 'Zend\EventManager\Filter\FilterInterface'  => 'vendor/zendframework/library/Zend/EventManager/Filter/FilterInterface.php',
                 'Zend\EventManager\Filter\FilterIterator'   => 'vendor/zendframework/library/Zend/EventManager/FilterIterator.php',
-        */
+
     )
 );
-
-//// Автозагрузка для версии битрикса до 14
-//spl_autoload_register(array('Rzn\Library\Loader', 'autoload'));
 
 IncludeModuleLangFile(__FILE__);
 
@@ -113,27 +110,8 @@ $sm->setService('config', $config);
 // Сам у себя менеджер сервисов
 $sm->setServiceLocator($sm);
 
-// Внедрение инициилизатора перенесено в конфиг local/modules/rzn.library/config/module.config.php (39)
-//$sm->addInitializer(new \Rzn\Library\ServiceManager\InterfaceInitializer($sm));
-
-/**
- * todo Проверить что не сломалось ничего и удалить это
- * Желетельно не использовать инициилизаторы в таком виде.
- * $serviceLazyConfig = new \Rzn\Library\ServiceManager\LazyConfig($sm);
- * $sm->addInitializer($serviceLazyConfig);
- * $sm->setService('service_lazy_config', $serviceLazyConfig);
- */
 $sm->setAllowOverride(true);
 
-
-/* todo Проверить что не сломалось ничего и удалить это
-$serviceLazyConfig->addSetter('Rzn\Library\Component\HelperManager', 'addInitializer',
-    [$serviceLazyConfig]);
-*/
-
-// Внедрение инициилизатора перенесено в конфиг local/modules/rzn.library/config/module.config.php (61)
-//$serviceLazyConfig->addSetter('Rzn\Library\Component\HelperManager', 'addInitializer',
-//    [new \Rzn\Library\ServiceManager\InterfaceInitializer($sm)]);
 
 
 $config->addApplication();
