@@ -58,9 +58,9 @@ class Mediator implements ConfigServiceAwareInterface, ServiceLocatorAwareInterf
         if (in_array($channel, $this->loadedChannels)) {
             return $this;
         }
-        $this->loadedChannels[] = $channel;
 
         if (isset($this->mediatorConfig['channels'][$channel])) {
+            $this->loadedChannels[] = $channel;
             $channelRetriever = $this->mediatorConfig['channels'][$channel];
                 // Возвращает функцию - слушателя канала.
                 if ($channelRetriever['waterfall']) {
@@ -133,7 +133,7 @@ class Mediator implements ConfigServiceAwareInterface, ServiceLocatorAwareInterf
         // Перед запуском канала смотрим слушателе его в конфиге
         $this->load($channel);
         if (!isset($this->channels[$channel])) {
-            new Exception('Повторное объявление слушателя канала.', 2);
+            new Exception('Канал не существует.', 2);
         }
         return call_user_func($this->channels[$channel], $arguments);
     }
