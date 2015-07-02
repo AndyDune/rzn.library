@@ -10,14 +10,10 @@
   */
 
 
-namespace Rzn\Library\Di\Handler;
+namespace Rzn\Library\Injector\Handler\SetterHandler;
 
 
-class Initializer 
+class Invokable 
 {
-    public function __construct($di, $configKey = null)
-    {
-
-    }
 
 }

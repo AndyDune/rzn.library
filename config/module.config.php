@@ -90,10 +90,10 @@ return array(
         )
     ),
 
-    'di' => [
+    'injector' => [
         'handlers' => [
-            'setter' => ['invokable' => 'Rzn\Library\Di\Handler\Setter', 'config' => 'di.setters', 'key' => 'setters'],
-            'initializer' => ['invokable' => 'Rzn\Library\Di\Handler\Initializer', 'config' => 'di.initializers', 'key' => 'initializers'],
+            'setter' => ['invokable' => 'Rzn\Library\Di\Handler\Setter', 'config' => 'injector.setters'],
+            'initializer' => ['invokable' => 'Rzn\Library\Di\Handler\Initializer', 'config' => 'injector.initializers'],
         ],
         'initializers' => [
             'Rzn\Library\ServiceManager\InterfaceInitializer'

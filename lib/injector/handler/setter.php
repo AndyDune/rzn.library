@@ -10,10 +10,13 @@
   */
 
 
-namespace Rzn\Library\Di\Handler\SetterHandler;
+namespace Rzn\Library\Injector\Handler;
 
 
-class Service 
+class Setter 
 {
+    public function __construct($di, $configKey = null)
+    {
 
+    }
 }

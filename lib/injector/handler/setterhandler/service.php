@@ -10,10 +10,10 @@
   */
 
 
-namespace Rzn\Library\Di\Handler\SetterHandler;
+namespace Rzn\Library\Injector\Handler\SetterHandler;
 
 
-class Config 
+class Service 
 {
 
 }
