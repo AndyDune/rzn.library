@@ -10,7 +10,7 @@
   */
 
 
-namespace Rzn\Library\Mediator;
+namespace Rzn\Library\Injector;
 
 
 use Rzn\Library\ServiceManager\InitializerInterface;
@@ -26,9 +26,9 @@ class Initializer implements InitializerInterface, ServiceLocatorAwareInterface
     protected $serviceManager;
 
     /**
-     * @var Mediator
+     * @var Injector
      */
-    protected $serviceMediator = null;
+    protected $serviceInjector = null;
 
 
     /**
@@ -42,19 +42,18 @@ class Initializer implements InitializerInterface, ServiceLocatorAwareInterface
         /**
          * Если класс объекта реализует интерфейс ConfigServiceAwareInterface делаем инъекцию сервисом конфигов
          */
-        if ($instance instanceof MediatorAwareInterface) {
-            $instance->setMediator($this->getMediator());
+        if ($instance instanceof InitializerInterface) {
+            $instance->setInjector($this->getInjector());
         }
     }
 
-    protected function getMediator()
+    protected function getInjector()
     {
-        if (!$this->serviceMediator) {
-            $this->serviceMediator = $this->serviceManager->get('mediator');
+        if (!$this->serviceInjector) {
+            $this->serviceInjector = $this->serviceManager->get('injector');
         }
-        return $this->serviceMediator;
+        return $this->serviceInjector;
     }
-
     /**
      * Внедрение сервис локатора
      *
@@ -63,7 +62,6 @@ class Initializer implements InitializerInterface, ServiceLocatorAwareInterface
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
         $this->serviceManager = $serviceLocator;
-        $this->serviceMediator = $serviceLocator->get('mediator');
     }
 
     /**

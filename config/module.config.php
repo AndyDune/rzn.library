@@ -47,6 +47,7 @@ return array(
             , 'Rzn\Library\ServiceManager\Initializer\CompletionTasks'
             , 'Rzn\Library\Mediator\Initializer'
             , 'Rzn\Library\Waterfall\Initializer'
+            , 'Rzn\Library\Injector\Initializer'
         ]
     ),
     'view_helpers' => array (

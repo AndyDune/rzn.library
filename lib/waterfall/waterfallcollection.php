@@ -29,12 +29,20 @@
 
 
 namespace Rzn\Library\Waterfall;
+use Rzn\Library\ServiceManager\InitializerInterface;
 use Rzn\Library\ServiceManager\ServiceLocatorAwareInterface;
 use Rzn\Library\ServiceManager\ServiceLocatorInterface;
 use Rzn\Library\ServiceManager\ConfigServiceAwareInterface;
+use Rzn\Library\Injector\InjectorAwareInterface;
 
-class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
+class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface, InjectorAwareInterface
 {
+
+    /**
+     * @var \Rzn\Library\Injector\Injector
+     */
+    protected $injector;
+
     protected $serviceManager;
     protected $waterfallsLoaded = [];
 
@@ -129,6 +137,10 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
         } else if (isset($channelRetriever['invokable'])) {
             $name = $channelRetriever['invokable'];
             $object = new $name();
+            // Обработка нового объеката иньектором
+            if (isset($channelRetriever['injector'])) {
+                $this->getInjector()->inject($object, $channelRetriever['injector']);
+            }
         }
         return $object;
     }
@@ -175,6 +187,23 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
     public function getServiceLocator()
     {
         return $this->serviceManager;
+    }
+
+    /**
+     * @return \Rzn\Library\Injector\Injector
+     */
+    public function getInjector()
+    {
+        return $this->injector;
+    }
+
+    /**
+     * Внедрение водопала делается инъектором
+     * @param $injector
+     */
+    public function setInjector($injector)
+    {
+        $this->injector = $injector;
     }
 
 }

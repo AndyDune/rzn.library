@@ -19,9 +19,15 @@ use Rzn\Library\ServiceManager\ConfigServiceAwareInterface;
 use Rzn\Library\ServiceManager\ServiceLocatorAwareInterface;
 use Rzn\Library\ServiceManager\ServiceLocatorInterface;
 use Rzn\Library\Waterfall\WaterfallAwareInterface;
+use Rzn\Library\Injector\InjectorAwareInterface;
 
-class Mediator implements ConfigServiceAwareInterface, ServiceLocatorAwareInterface, WaterfallAwareInterface
+class Mediator implements ConfigServiceAwareInterface, ServiceLocatorAwareInterface, WaterfallAwareInterface, InjectorAwareInterface
 {
+    /**
+     * @var \Rzn\Library\Injector\Injector
+     */
+    protected $injector;
+
     protected $channels = [];
 
     protected $loadedChannels = [];
@@ -109,6 +115,10 @@ class Mediator implements ConfigServiceAwareInterface, ServiceLocatorAwareInterf
         } else if (isset($channelRetriever['invokable'])) {
             $name = $channelRetriever['invokable'];
             $object = new $name();
+            // Обработка нового объеката иньектором
+            if (isset($channelRetriever['injector'])) {
+                $this->getInjector()->inject($object, $channelRetriever['injector']);
+            }
         }
         if ($channelRetriever['shared'] !== false) {
             $this->sharedLoader[$name] = $object;
@@ -213,5 +223,22 @@ class Mediator implements ConfigServiceAwareInterface, ServiceLocatorAwareInterf
         $this->waterfall = $waterfall;
     }
 
+
+    /**
+     * @return \Rzn\Library\Injector\Injector
+     */
+    public function getInjector()
+    {
+        return $this->injector;
+    }
+
+    /**
+     * Внедрение водопала делается инъектором
+     * @param $injector
+     */
+    public function setInjector($injector)
+    {
+        $this->injector = $injector;
+    }
 
 }
