@@ -25,7 +25,7 @@ class Initializer implements InitializerInterface, ServiceLocatorAwareInterface
      */
     protected $serviceManager;
 
-    protected $serviceWaterfall;
+    protected $serviceWaterfall = null;
 
 
     /**
@@ -40,8 +40,17 @@ class Initializer implements InitializerInterface, ServiceLocatorAwareInterface
          * Если класс объекта реализует интерфейс делаем инъекцию сервисом водопада
          */
         if ($instance instanceof WaterfallAwareInterface) {
-            $instance->setWaterfall($this->serviceWaterfall);
+            $instance->setWaterfall($this->getWaterfall());
         }
+    }
+
+
+    protected function getWaterfall()
+    {
+        if (!$this->serviceWaterfall) {
+            $this->serviceWaterfall = $this->serviceWaterfall->get('waterfall');
+        }
+        return $this->serviceWaterfall;
     }
 
     /**
@@ -52,7 +61,6 @@ class Initializer implements InitializerInterface, ServiceLocatorAwareInterface
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
         $this->serviceManager = $serviceLocator;
-        $this->serviceWaterfall = $serviceLocator->get('waterfall');
     }
 
     /**

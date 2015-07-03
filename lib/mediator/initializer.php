@@ -63,7 +63,6 @@ class Initializer implements InitializerInterface, ServiceLocatorAwareInterface
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
         $this->serviceManager = $serviceLocator;
-        $this->serviceMediator = $serviceLocator->get('mediator');
     }
 
     /**
