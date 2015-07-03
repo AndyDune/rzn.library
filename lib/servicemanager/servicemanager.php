@@ -104,6 +104,18 @@ class ServiceManager implements ServiceLocatorInterface, ServiceLocatorAwareInte
 
 
     /**
+     * Сохраненные инструкици для инъектора.
+     *
+     * @var array
+     */
+    protected $injectorInstructions = [];
+
+    public function addInjectorInstruction($name, $options)
+    {
+        $this->injectorInstructions[$this->canonicalizeName($name)] = $options;
+    }
+
+    /**
      * @return Config
      */
     public function getConfig()
@@ -141,6 +153,11 @@ class ServiceManager implements ServiceLocatorInterface, ServiceLocatorAwareInte
                     if (isset($value['shared'])) {
                         $shared = $value['shared'];
                     }
+
+                    if (isset($value['injector'])) {
+                        $this->addInjectorInstruction($key, $value['injector']);
+                    }
+
                     if (isset($value['name'])) {
                         $value = $value['name'];
                     } else {
@@ -162,6 +179,11 @@ class ServiceManager implements ServiceLocatorInterface, ServiceLocatorAwareInte
                     if (isset($value['shared'])) {
                         $shared = $value['shared'];
                     }
+
+                    if (isset($value['injector'])) {
+                        $this->addInjectorInstruction($key, $value['injector']);
+                    }
+
                     if (isset($value['name'])) {
                         $value = $value['name'];
                     } else {
@@ -316,16 +338,30 @@ class ServiceManager implements ServiceLocatorInterface, ServiceLocatorAwareInte
             $this->instances[$cName] = $instance;
         }
 
-        if (count($this->interfaceInitializer)) {
-            foreach($this->interfaceInitializer as $interfaceInitializer) {
-                $interfaceInitializer->initialize($instance, $cName);
-            }
+        $this->executeInitialize($instance, $cName);
+
+        if (isset($this->injectorInstructions[$cName])) {
+            $this->getServiceLocator()->get('injector')->inject($instance, $this->injectorInstructions[$cName]);
         }
 
         end:
         if (is_object($instance) and $instance instanceof InvokeInterface)
             $instance->invoke($this->getServiceLocator());
         return $instance;
+    }
+
+    /**
+     * Запуск нициилизатора сервиса.
+     * @param $object
+     * @param null $name
+     */
+    public function executeInitialize($object, $name = null)
+    {
+        if (count($this->interfaceInitializer)) {
+            foreach($this->interfaceInitializer as $interfaceInitializer) {
+                $interfaceInitializer->initialize($object, $name);
+            }
+        }
     }
 
     /**
