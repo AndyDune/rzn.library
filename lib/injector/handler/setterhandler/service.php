@@ -11,9 +11,41 @@
 
 
 namespace Rzn\Library\Injector\Handler\SetterHandler;
+use Rzn\Library\ServiceManager\ServiceLocatorAwareInterface;
+use Rzn\Library\ServiceManager\ServiceLocatorInterface;
 
-
-class Service 
+class Service implements ServiceLocatorAwareInterface
 {
+    protected $serviceManager;
+
+    public function execute($object, $params)
+    {
+        if (isset($params['method'])) {
+            $method = $params['method'];
+        } else {
+            $method = 'set' . ucfirst($params['set']);
+        }
+        call_user_func([$object, $method], $this->getServiceLocator()->get($params['service']));
+    }
+
+    /**
+     * Внедрение сервис локатора
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     */
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->serviceManager = $serviceLocator;
+    }
+
+    /**
+     * Возврат сервис локатора.
+     *
+     * @return ServiceLocatorInterface
+     */
+    public function getServiceLocator()
+    {
+        return $this->serviceManager;
+    }
 
 }

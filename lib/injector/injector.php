@@ -14,14 +14,24 @@ namespace Rzn\Library\Injector;
 use Rzn\Library\Exception;
 use Rzn\Library\ServiceManager\ServiceLocatorAwareInterface;
 use Rzn\Library\ServiceManager\ServiceLocatorInterface;
+use Rzn\Library\ServiceManager\ConfigServiceAwareInterface;
 
-class Injector implements ServiceLocatorAwareInterface
+class Injector implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
 {
+    /**
+     * @var \Rzn\Library\Config
+     */
+    protected $configService;
 
     protected $serviceManager;
 
-    protected $handlerClasses = [];
     protected $handlerObject = [];
+
+    /**
+     * Инндикатор необходимости инициилизации из конфига.
+     * @var bool
+     */
+    protected $needInit = true;
 
     protected $defaultOption = [
         'initialize' => ['type' => 'initializer']
@@ -29,6 +39,10 @@ class Injector implements ServiceLocatorAwareInterface
 
     public function inject($object, $options = null)
     {
+        if ($this->needInit) {
+            $this->initServicesFromConfig();
+            $this->needInit = false;
+        }
         // По умолчанию делается инициилизация
         if (!$options) {
             $options = $this->defaultOption;
@@ -41,23 +55,33 @@ class Injector implements ServiceLocatorAwareInterface
             } else {
                 throw new Exception('Обработчик инъекции не указан.');
             }
-            if (!isset($this->handlerClasses[$handler])) {
+            if (!isset($this->handlerObject[$handler])) {
                 throw new Exception('Обработчик инъекции не зарегистрирован: ' . $handler);
             }
 
             if (!isset($optionValue['options'])) {
                 $optionValue['options'] = null;
             }
+            $this->handlerObject[$handler]->execute($object, $optionValue['options']);
+        }
+    }
 
-            if (!isset($this->handlerObject[$handler])) {
-                $class = $this->handlerClasses[$handler];
-                $handlerOptions = [];
-                $handler = new $class($handlerOptions);
-                $this->getServiceLocator()->executeInitialize($handler);
-                $this->handlerObject[$handler] = $handler;
+    public function initServicesFromConfig()
+    {
+        $configService = $this->getConfigService();
+        $config = $configService['injector'];
+        if (!$config or !isset($config['handlers'])) {
+            return null;
+        }
+        foreach($config['handlers'] as $name => $params) {
+            $class = $params['invokable'];
+            if (isset($params['config'])) {
+                $arg =  $configService->getNested($params['config']);
+            } else {
+                $arg = null;
             }
-            $handler->setOptions($optionValue['options']);
-            $handler->execute($object);
+            $this->handlerObject[$name] = new $class($this, $arg);
+            $this->getServiceLocator()->executeInitialize($this->handlerObject[$name]);
         }
     }
 
@@ -79,6 +103,19 @@ class Injector implements ServiceLocatorAwareInterface
     public function getServiceLocator()
     {
         return $this->serviceManager;
+    }
+
+    /**
+     * @return \Rzn\Library\Config
+     */
+    public function getConfigService()
+    {
+        return $this->configService;
+    }
+
+    public function setConfigService($config)
+    {
+        $this->configService = $config;
     }
 
 }

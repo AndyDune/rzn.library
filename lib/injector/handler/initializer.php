@@ -15,7 +15,7 @@ namespace Rzn\Library\Injector\Handler;
 
 class Initializer 
 {
-    public function __construct($di, $configKey = null)
+    public function __construct($injector, $config = null)
     {
 
     }

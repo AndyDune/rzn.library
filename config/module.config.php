@@ -28,6 +28,7 @@ return array(
             ,'completion_tasks' => 'Rzn\Library\CompletionTasks'
             ,'mediator'         => 'Rzn\Library\Mediator\Mediator'
             ,'waterfall'        => 'Rzn\Library\Waterfall\WaterfallCollection'
+            ,'injector'        => 'Rzn\Library\Injector\Injector'
 
         ),
 
@@ -93,8 +94,8 @@ return array(
 
     'injector' => [
         'handlers' => [
-            'setter' => ['invokable' => 'Rzn\Library\Di\Handler\Setter', 'config' => 'injector.setters'],
-            'initializer' => ['invokable' => 'Rzn\Library\Di\Handler\Initializer', 'config' => 'injector.initializers'],
+            'setter' => ['invokable' => 'Rzn\Library\Injector\Handler\Setter', 'config' => 'injector.setters'],
+            'initializer' => ['invokable' => 'Rzn\Library\Injector\Handler\Initializer', 'config' => 'injector.initializers'],
         ],
         'initializers' => [
             'Rzn\Library\ServiceManager\InterfaceInitializer'
@@ -107,9 +108,9 @@ return array(
             , 'Rzn\Library\Waterfall\Initializer'
         ],
         'setters' => [
-            'config' => 'Rzn\Library\Di\Handler\SetterHandler\Config',
-            'invokable' => 'Rzn\Library\Di\Handler\SetterHandler\Invokable',
-            'service' => 'Rzn\Library\Di\Handler\SetterHandler\Service'
+            'config' => 'Rzn\Library\Injector\Handler\SetterHandler\Config',
+            'invokable' => 'Rzn\Library\Injector\Handler\SetterHandler\Invokable',
+            'service' => 'Rzn\Library\Injector\Handler\SetterHandler\Service'
         ]
 
     ],

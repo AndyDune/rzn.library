@@ -42,7 +42,7 @@ class Initializer implements InitializerInterface, ServiceLocatorAwareInterface
         /**
          * Если класс объекта реализует интерфейс ConfigServiceAwareInterface делаем инъекцию сервисом конфигов
          */
-        if ($instance instanceof InitializerInterface) {
+        if ($instance instanceof InjectorAwareInterface) {
             $instance->setInjector($this->getInjector());
         }
     }
