@@ -38,14 +38,14 @@ class Initializer implements InitializerInterface, ServiceLocatorAwareInterface
      * @param $serviceManager
      */
     public function initialize($instance, $serviceManager)
-    {
+     {
         /**
          * Если класс объекта реализует интерфейс ConfigServiceAwareInterface делаем инъекцию сервисом конфигов
          */
         if ($instance instanceof InjectorAwareInterface) {
             $instance->setInjector($this->getInjector());
         }
-    }
+     }
 
     protected function getInjector()
     {

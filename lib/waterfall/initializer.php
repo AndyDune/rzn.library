@@ -48,7 +48,7 @@ class Initializer implements InitializerInterface, ServiceLocatorAwareInterface
     protected function getWaterfall()
     {
         if (!$this->serviceWaterfall) {
-            $this->serviceWaterfall = $this->serviceWaterfall->get('waterfall');
+            $this->serviceWaterfall = $this->serviceManager->get('waterfall');
         }
         return $this->serviceWaterfall;
     }

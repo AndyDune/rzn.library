@@ -52,6 +52,8 @@ class Mediator implements ConfigServiceAwareInterface, ServiceLocatorAwareInterf
      * @var \Rzn\Library\Waterfall\WaterfallCollection
      */
     protected $waterfall;
+
+
     /**
      * Загрузка слушателей канала из конфига.
      *
@@ -112,6 +114,11 @@ class Mediator implements ConfigServiceAwareInterface, ServiceLocatorAwareInterf
         if (isset($channelRetriever['service'])) {
             $name = $channelRetriever['service'];
             $object = $this->getServiceLocator()->get($name);
+            // Обработка нового объеката иньектором
+            if (isset($channelRetriever['injector'])) {
+                $this->getInjector()->inject($object, $channelRetriever['injector']);
+            }
+
         } else if (isset($channelRetriever['invokable'])) {
             $name = $channelRetriever['invokable'];
             $object = new $name();
