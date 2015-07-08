@@ -1,16 +1,17 @@
 <?php
- /**
-  * ----------------------------------------------------
-  * | Автор: Андрей Рыжов (Dune) <info@rznw.ru>         |
-  * | Сайт: www.rznw.ru                                 |
-  * | Телефон: +7 (4912) 51-10-23                       |
-  * | Дата: 24.11.14                                      
-  * ----------------------------------------------------
-  *
-  */
+/**
+ * ----------------------------------------------------
+ * | Автор: Андрей Рыжов (Dune) <info@rznw.ru>         |
+ * | Сайт: www.rznw.ru                                 |
+ * | Телефон: +7 (4912) 51-10-23                       |
+ * | Дата: 24.11.14
+ * ----------------------------------------------------
+ *
+ */
 
 
 namespace Rzn\Library\EventManager;
+
 use Rzn\Library\Config;
 use Rzn\Library\ServiceManager\ServiceLocatorAwareInterface;
 use Rzn\Library\ServiceManager\ServiceLocatorInterface;
@@ -21,9 +22,16 @@ use Zend\EventManager\EventManager as ZendEventManager;
 
 use Zend\Stdlib\PriorityQueue;
 use Zend\Stdlib\CallbackHandler;
+use Rzn\Library\Injector\InjectorAwareInterface;
 
-class EventManager extends ZendEventManager implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
+class EventManager extends ZendEventManager implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface, InjectorAwareInterface
 {
+
+    /**
+     * @var \Rzn\Library\Injector\Injector
+     */
+    protected $injector;
+
     protected $serviceManager;
 
     /**
@@ -86,15 +94,25 @@ class EventManager extends ZendEventManager implements ServiceLocatorAwareInterf
 
     public function registerEventsServices($eventListeners, $event)
     {
-        foreach($eventListeners as $listener) {
+        foreach ($eventListeners as $listener) {
             $priority = 1;
             if (is_array($listener)) {
+                $retriever = $listener;
                 if (isset($listener['priority'])) {
                     $priority = $listener['priority'];
                 }
-                $listener = $listener[0];
+                if (isset($listener['name'])) {
+                    $listener = $listener['name'];
+                } else {
+                    $listener = $listener[0];
+                }
             }
             $object = $this->serviceManager->get($listener);
+
+            if (isset($retriever['injector'])) {
+                $this->getInjector()->inject($object, $retriever['injector']);
+            }
+
             $this->attach($event, $object, $priority);
         }
 
@@ -109,22 +127,31 @@ class EventManager extends ZendEventManager implements ServiceLocatorAwareInterf
      */
     public function registerEventsFactories($eventListeners, $event)
     {
-        foreach($eventListeners as $listener) {
+        foreach ($eventListeners as $listener) {
             $priority = 1;
             if (is_array($listener)) {
+                $retriever = $listener;
                 if (isset($listener['priority'])) {
                     $priority = $listener['priority'];
                 }
-                $listener = $listener[0];
+                if (isset($listener['name'])) {
+                    $listener = $listener['name'];
+                } else {
+                    $listener = $listener[0];
+                }
             }
 
             $object = new $listener();
             $object = $object->createEventListener($this->serviceManager);
 
             if (count($this->interfaceInitializer)) {
-                foreach($this->interfaceInitializer as $interfaceInitializer) {
+                foreach ($this->interfaceInitializer as $interfaceInitializer) {
                     $interfaceInitializer->initialize($object, '');
                 }
+            }
+
+            if (isset($retriever['injector'])) {
+                $this->getInjector()->inject($object, $retriever['injector']);
             }
 
             $this->attach($event, $object, $priority);
@@ -133,24 +160,35 @@ class EventManager extends ZendEventManager implements ServiceLocatorAwareInterf
 
     public function registerEventsInvokables($eventListeners, $event)
     {
-        foreach($eventListeners as $listener) {
+        foreach ($eventListeners as $listener) {
             $priority = 1;
             if (is_array($listener)) {
+                $retriever = $listener;
                 if (isset($listener['priority'])) {
                     $priority = $listener['priority'];
                 }
-                $listener = $listener[0];
+                if (isset($listener['name'])) {
+                    $listener = $listener['name'];
+                } else {
+                    $listener = $listener[0];
+                }
             }
+
             $object = new $listener();
             if ($object instanceof ServiceLocatorAwareInterface) {
                 $object->setServiceLocator($this->serviceManager);
             }
 
             if (count($this->interfaceInitializer)) {
-                foreach($this->interfaceInitializer as $interfaceInitializer) {
+                foreach ($this->interfaceInitializer as $interfaceInitializer) {
                     $interfaceInitializer->initialize($object, '');
                 }
             }
+
+            if (isset($retriever['injector'])) {
+                $this->getInjector()->inject($object, $retriever['injector']);
+            }
+
 
             $this->attach($event, $object, $priority);
         }
@@ -170,7 +208,7 @@ class EventManager extends ZendEventManager implements ServiceLocatorAwareInterf
          */
         if (!is_callable($object)) {
             if ($object instanceof EventListenerInterface) {
-                $object = function($e) use ($object) {
+                $object = function ($e) use ($object) {
                     return $object->trigger($e);
                 };
             }
@@ -199,7 +237,7 @@ class EventManager extends ZendEventManager implements ServiceLocatorAwareInterf
         }
         if (isset($config['configurable_event_manager']['initializers'])) {
 
-            foreach($config['configurable_event_manager']['initializers'] as $key => $value) {
+            foreach ($config['configurable_event_manager']['initializers'] as $key => $value) {
                 $initializer = new $value();
                 if ($initializer instanceof ServiceLocatorAwareInterface) {
                     $initializer->setServiceLocator($this->getServiceLocator());
@@ -254,5 +292,20 @@ class EventManager extends ZendEventManager implements ServiceLocatorAwareInterf
         return $this->serviceManager;
     }
 
+    /**
+     * @return \Rzn\Library\Injector\Injector
+     */
+    public function getInjector()
+    {
+        return $this->injector;
+    }
 
+    /**
+     * Внедрение водопала делается инъектором
+     * @param $injector
+     */
+    public function setInjector($injector)
+    {
+        $this->injector = $injector;
+    }
 }
