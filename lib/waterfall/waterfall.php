@@ -22,9 +22,21 @@ class Waterfall
     protected $finalFunction = null;
     protected $errorFunction = null;
 
+    protected $resultShared = false;
+
     public function __construct($name = null)
     {
         $this->name = $name;
+    }
+
+    /**
+     * Управление передачей результатов работы функций водопада.
+     *
+     * @param bool $flag
+     */
+    public function setResultShared($flag = false)
+    {
+        $this->resultShared = $flag;
     }
 
     public function addFunction($function)
@@ -66,7 +78,9 @@ class Waterfall
             $resultObject = new Result();
             //pr($this->functions);
             foreach ($this->functions as $function) {
-                $resultObject->reset();
+                if (!$this->resultShared) {
+                    $resultObject->reset();
+                }
                 $function($params, $resultObject);
                 $params = $resultObject->getResults();
                 if ($err = $resultObject->getError()) {
@@ -76,13 +90,17 @@ class Waterfall
             if ($err) {
                 /** @var callable $func */
                 if ($func = $this->getErrorFunction()) {
-                    $resultObject->reset();
+                    if (!$this->resultShared) {
+                        $resultObject->reset();
+                    }
                     $func($params, $resultObject);
                     return $resultObject;
                 }
             }
             if ($func = $this->getFinalFunction()) {
-                $resultObject->reset();
+                if (!$this->resultShared) {
+                    $resultObject->reset();
+                }
                 $func($params, $resultObject);
                 return $resultObject;
             }

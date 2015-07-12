@@ -90,6 +90,9 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
                 $waterfall->setErrorFunction($this->_buildFunction($item, $service, 'error'));
 
             }
+            if (isset($streamDescription['result_shared'])) {
+                $waterfall->setResultShared($streamDescription['result_shared']);
+            }
 
         }
 
