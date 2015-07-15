@@ -76,6 +76,9 @@ class Waterfall
             $err = null;
             /** @var \Rzn\Library\Waterfall\Result $resultObject */
             $resultObject = new Result();
+            if ($this->resultShared) {
+                $resultObject->setResults($params);
+            }
             //pr($this->functions);
             foreach ($this->functions as $function) {
                 if (!$this->resultShared) {
