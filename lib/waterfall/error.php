@@ -27,6 +27,12 @@ class Error implements ArrayAccess
         $this->code = $code;
     }
 
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+
     public function setMessage($message)
     {
         $this->message = $message;
