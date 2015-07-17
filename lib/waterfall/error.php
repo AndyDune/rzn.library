@@ -27,6 +27,10 @@ class Error implements ArrayAccess
         $this->code = $code;
     }
 
+    /**
+     * Возврат кода ошибки.
+     * @return null
+     */
     public function getCode()
     {
         return $this->code;
