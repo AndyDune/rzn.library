@@ -134,19 +134,20 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
      */
     protected function getObjectIfShared($channelRetriever)
     {
-        if (isset($channelRetriever['service'])) {
-            $name = $channelRetriever['service'];
-            $object = $this->getServiceLocator()->get($name);
-        } else if (isset($channelRetriever['invokable'])) {
+        if (isset($channelRetriever['invokable'])) {
             $name = $channelRetriever['invokable'];
             $object = new $name();
             // Обработка нового объеката иньектором
             if (isset($channelRetriever['injector'])) {
                 $this->getInjector()->inject($object, $channelRetriever['injector']);
             }
+        } else if (isset($channelRetriever['service'])) {
+            $name = $channelRetriever['service'];
+            $object = $this->getServiceLocator()->get($name);
         }
         return $object;
     }
+
 
     /**
      * Инъекция сервиса конфига.
