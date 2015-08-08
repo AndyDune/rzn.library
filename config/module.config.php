@@ -110,7 +110,8 @@ return array(
         'setters' => [
             'config' => 'Rzn\Library\Injector\Handler\SetterHandler\Config',
             'invokable' => 'Rzn\Library\Injector\Handler\SetterHandler\Invokable',
-            'service' => 'Rzn\Library\Injector\Handler\SetterHandler\Service'
+            'service' => 'Rzn\Library\Injector\Handler\SetterHandler\Service',
+            'params' => 'Rzn\Library\Injector\Handler\SetterHandler\Params'
         ]
 
     ],
