@@ -44,10 +44,25 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
     protected $injector;
 
     protected $serviceManager;
+
+    /**
+     * Кеш уже загруженных водопадов.
+     * @var array
+     */
     protected $waterfallsLoaded = [];
 
+    /**
+     * Объект конфига полностью
+     *
+     * @var \Rzn\Library\Config
+     */
     protected $configService;
 
+    /**
+     * Часть объекта конфига под ключем waterfall
+     *
+     * @var \Rzn\Library\Config
+     */
     protected $waterfallConfig;
 
     /**
@@ -73,24 +88,43 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
         $waterfall = new Waterfall($name);
         if (isset($this->waterfallConfig['streams'][$name])) {
             $streamDescription = $this->waterfallConfig['streams'][$name];
-            //pr($streamDescription);
-                foreach($streamDescription['drops'] as $item) {
+                foreach($streamDescription['drops'] as $dropName => $item) {
+                    // Для тестов возможно не добавлять дропы в водопад
+                    if (isset($item['skip']) and $item['skip']) {
+                        continue;
+                    }
+                    if (isset($item['stop']) and $item['stop']) {
+                        $waterfall->setStopDropName($dropName);
+                    }
                     $service = $this->getObjectIfShared($item);
-                    $waterfall->addFunction($this->_buildFunction($item, $service, 'drop'));
+                    $waterfall->addFunction($this->_buildFunction($item, $service, 'drop'), $dropName);
                 }
             if (isset($streamDescription['final'])) {
                 $item = $streamDescription['final'];
-                $service = $this->getObjectIfShared($item);
-                $waterfall->setFinalFunction($this->_buildFunction($item, $service, 'final'));
-
+                // Для тестов возможно не добавлять финальную функцию
+                if (!isset($item['skip']) or !$item['skip']) {
+                    $service = $this->getObjectIfShared($item);
+                    $waterfall->setFinalFunction($this->_buildFunction($item, $service, 'final'));
+                }
             }
             if (isset($streamDescription['error'])) {
                 $item = $streamDescription['error'];
-                $service = $this->getObjectIfShared($item);
-                $waterfall->setErrorFunction($this->_buildFunction($item, $service, 'error'));
+                // Для тестов возможно не добавлять функцию ошибки
+                if (!isset($item['skip']) or !$item['skip']) {
+                    $service = $this->getObjectIfShared($item);
+                    $waterfall->setErrorFunction($this->_buildFunction($item, $service, 'error'));
+                }
 
             }
+            // Функция запускаемая после остановки водопада
+            if (isset($streamDescription['stop'])) {
+                $item = $streamDescription['stop'];
+                $service = $this->getObjectIfShared($item);
+                $waterfall->setStopFunction($this->_buildFunction($item, $service, 'stop'));
+            }
+
             if (isset($streamDescription['result_shared'])) {
+                // Включаем запрет сброса объекта результатов между запусками функций водопада.
                 $waterfall->setResultShared($streamDescription['result_shared']);
             }
 

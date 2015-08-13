@@ -17,11 +17,46 @@ use Rzn\Library\Format\ArrayModification;
 
 class Result implements ArrayAccess
 {
+    /**
+     * Результат работы фуккции водопада.
+     * По умолчанию значение этой переменной передается следующей функции и сбрасывается перед передачей объекта следующей.
+     *
+     * @var array
+     */
     protected $results = [];
 
+    /**
+     * Явный (специальный) разделяемый результат работы функций водопада.
+     * Используется отдельно от основного массива рез-ов.
+     *
+     * @var array
+     */
     protected $sharedResults = [];
 
     protected $error = null;
+
+    /**
+     * Индикатор остановки работы водопада.
+     *
+     * @var null|bool
+     */
+    protected $finish = null;
+
+    /**
+     * Имя текущей (или поледней) функции для выполнения.
+     * Это может быть имя дропа, final или error
+     *
+     * @var string
+     */
+    protected $currentFunctionName = '';
+
+    /**
+     * Флаг остановки водопада.
+     * Необходим для тестовых целей. При остановке не происходит запуска следующих дропов, функции ошибки и результата.
+     *
+     * @var null|array
+     */
+    protected $stop = null;
 
     public function setError($error)
     {
@@ -76,6 +111,57 @@ class Result implements ArrayAccess
 
 
     /**
+     * Жесткая остановка работы водопада.
+     * Подобное применяется в целях теста.
+     * Для нормального окончания работы водопада приемнять метод finish.
+     *
+     * @param $message
+     */
+    public function stop($message)
+    {
+        $this->stop = [
+            'function' => $this->currentFunctionName,
+            'message' => $message
+        ];
+    }
+
+    /**
+     * Произошла ли остановка водопада.
+     * Возвращается null при отсутствии остановки или массив формата:
+     * [
+     *   'function' => 'имя функции на которой произошла остановка'
+     *   'message'  => 'сообщение при остановке'
+     * ]
+     *
+     * @return array|null
+     */
+    public function isStopped()
+    {
+        return $this->stop;
+    }
+
+    /**
+     * Фиксация заявки на окончание работы водопада.
+     * Если остались еще дропа на очереди - они пропускаются.
+     * Сразу запускается финальная функция если она есть.
+     *
+     */
+    public function finish()
+    {
+        $this->finish = true;
+    }
+
+    /**
+     * Проверка на окончание работы водопада.
+     *
+     * @return bool|null
+     */
+    public function isFinished()
+    {
+        return $this->finish;
+    }
+
+    /**
      * @return Error
      */
     public function getError()
@@ -83,14 +169,28 @@ class Result implements ArrayAccess
         return $this->error;
     }
 
+    /**
+     * Внедрение разделяемых результатов.
+     *
+     * @param $results
+     */
     public function setSharedResult($results)
     {
         $this->sharedResults = $results;
+        return $this;
     }
 
+    /**
+     * Добавление разделяемых результатов.
+     *
+     * @param $key
+     * @param $value
+     * @return $this
+     */
     public function addSharedResult($key, $value)
     {
         $this->sharedResults[$key] = $value;
+        return $this;
     }
 
     public function getSharedResults()
@@ -112,6 +212,29 @@ class Result implements ArrayAccess
     {
         $this->results = [];
     }
+
+    /**
+     * Указание имени текущей функции для выполнения.
+     * Ключ (имя) дропа, final или error
+     *
+     * @param $functionName
+     * @return $this
+     */
+    public function setCurrentFunction($functionName)
+    {
+        $this->currentFunctionName = $functionName;
+        return $this;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getCurrentFunction()
+    {
+        return $this->currentFunctionName;
+    }
+
 
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
