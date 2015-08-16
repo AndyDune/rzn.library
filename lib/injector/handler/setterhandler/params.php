@@ -31,7 +31,7 @@
 */
 
 namespace Rzn\Library\Injector\Handler\SetterHandler;
-use Rzn\Library\Config;
+use Rzn\Library\Config as ConfigService;
 
 class Params 
 {
@@ -41,7 +41,7 @@ class Params
      */
     public function execute($object, $params)
     {
-        if ($params instanceof Config) {
+        if ($params instanceof ConfigService) {
             $params = $params->toArray();
         }
         if (isset($params['param'])) {
