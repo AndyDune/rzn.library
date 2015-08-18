@@ -43,9 +43,15 @@ class Injector implements ServiceLocatorAwareInterface, ConfigServiceAwareInterf
             $this->initServicesFromConfig();
             $this->needInit = false;
         }
-        // По умолчанию делается инициилизация
+
         if (!$options) {
-            $options = $this->defaultOption;
+            // Есть описание для инъектора внутри объекта
+            if ($object instanceof OptionsRetrieverInterface) {
+                $options = $object->getInjectorOptions();
+            } else {
+                // По умолчанию делается инициилизация
+                $options = $this->defaultOption;
+            }
         }
         foreach($options as $optionName => $optionValue) {
             if (isset($optionValue['type'])) {
