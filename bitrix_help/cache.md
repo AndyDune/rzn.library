@@ -2,6 +2,15 @@
 
 
 ```php
+
+namespace MyManeSpace;
+
+use Bitrix\Main\Data\Cache;
+
+class Messages 
+{
+     ........
+     
     public function getMessages($space)
     {
         $result = [];
