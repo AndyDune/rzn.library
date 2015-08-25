@@ -31,7 +31,7 @@ use Rzn\Library\Injector\Exception;
 
 class CustomService implements ServiceLocatorAwareInterface
 {
-    protected $serviceManager;
+    protected $customServiceManager;
 
     public function execute($object, $params)
     {
@@ -44,7 +44,7 @@ class CustomService implements ServiceLocatorAwareInterface
             throw new Exception('Для инъектора не указаны обязательные параметры: manager и(или) service');
         }
         call_user_func([$object, $method],
-            $this->getServiceLocator()->get('custom_service_managers')->get($params['manager'])->get($params['service']));
+            $this->customServiceManager->get($params['manager'])->get($params['service']));
     }
 
     /**
@@ -54,7 +54,7 @@ class CustomService implements ServiceLocatorAwareInterface
      */
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
-        $this->serviceManager = $serviceLocator;
+        $this->customServiceManager = $serviceLocator->get('custom_service_managers');
     }
 
     /**
@@ -64,6 +64,6 @@ class CustomService implements ServiceLocatorAwareInterface
      */
     public function getServiceLocator()
     {
-        return $this->serviceManager;
+        return $this->customServiceManager;
     }
 }
