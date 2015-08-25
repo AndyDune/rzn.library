@@ -29,6 +29,7 @@ return array(
             ,'mediator'         => 'Rzn\Library\Mediator\Mediator'
             ,'waterfall'        => 'Rzn\Library\Waterfall\WaterfallCollection'
             ,'injector'        => 'Rzn\Library\Injector\Injector'
+            ,'custom_service_managers'  => 'Rzn\Library\ServiceManager\AbstractFactory'
 
         ),
 
@@ -111,7 +112,8 @@ return array(
             'config' => 'Rzn\Library\Injector\Handler\SetterHandler\Config',
             'invokable' => 'Rzn\Library\Injector\Handler\SetterHandler\Invokable',
             'service' => 'Rzn\Library\Injector\Handler\SetterHandler\Service',
-            'params' => 'Rzn\Library\Injector\Handler\SetterHandler\Params'
+            'params' => 'Rzn\Library\Injector\Handler\SetterHandler\Params',
+            'custom_service' => 'Rzn\Library\Injector\Handler\SetterHandler\CustomService'
         ]
 
     ],
