@@ -44,9 +44,15 @@ class Waterfall
      */
     protected $stopDropName = null;
 
-    public function __construct($name = null)
+    /**
+     * @var WaterfallCollection
+     */
+    protected $collection;
+
+    public function __construct($name = null, WaterfallCollection $collection)
     {
         $this->name = $name;
+        $this->collection = $collection;
     }
 
     /**
@@ -90,10 +96,17 @@ class Waterfall
     }
 
     /**
+     * Возврат функции, которая запускается при успешном проходе водопада.
+     * Может отсутствовать.
+     *
      * @return null|callable
      */
     public function getFinalFunction()
     {
+        if (!is_callable($this->finalFunction)) {
+            $this->finalFunction = $this->collection->getFunctionFromDescription($this->finalFunction, 'final');
+        }
+
         return $this->finalFunction;
     }
 
@@ -106,10 +119,17 @@ class Waterfall
     }
 
     /**
+     * Возврат функции, которая срабатывает при ошибке.
+     * Может отсутствовать.
+     *
      * @return null|callable
      */
     public function getErrorFunction()
     {
+        if (!is_callable($this->errorFunction)) {
+            $this->errorFunction = $this->collection->getFunctionFromDescription($this->errorFunction, 'error');
+        }
+
         return $this->errorFunction;
     }
 
@@ -127,6 +147,10 @@ class Waterfall
      */
     public function getStopFunction()
     {
+        if (!is_callable($this->stopFunction)) {
+            $this->stopFunction = $this->collection->getFunctionFromDescription($this->stopFunction, 'stop');
+        }
+
         return $this->stopFunction;
     }
 
@@ -150,6 +174,10 @@ class Waterfall
                     $resultObject->reset();
                 }
                 $resultObject->setCurrentFunction($functionName);
+                if (!is_callable($function)) {
+                    // Для следующего запуска функция будет уже создана
+                    $this->functions[$functionName] = $function = $this->collection->getFunctionFromDescription($function, 'drop');
+                }
                 $function($params, $resultObject);
                 // Выборка содержимого объекта результатов в виде массива для следующих функций в водопаде
                 $params = $resultObject->getResults();

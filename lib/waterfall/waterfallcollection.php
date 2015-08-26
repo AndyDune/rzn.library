@@ -85,7 +85,7 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
 
     public function loadWaterfall($name)
     {
-        $waterfall = new Waterfall($name);
+        $waterfall = new Waterfall($name, $this);
         if (isset($this->waterfallConfig['streams'][$name])) {
             $streamDescription = $this->waterfallConfig['streams'][$name];
                 foreach($streamDescription['drops'] as $dropName => $item) {
@@ -96,31 +96,30 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
                     if (isset($item['stop']) and $item['stop']) {
                         $waterfall->setStopDropName($dropName);
                     }
-                    $service = $this->getObjectIfShared($item);
-                    $waterfall->addFunction($this->_buildFunction($item, $service, 'drop'), $dropName);
+                    // Создание функции для дропа отклыдывается на момент запуска
+                    $waterfall->addFunction($item, $dropName);
                 }
             if (isset($streamDescription['final'])) {
                 $item = $streamDescription['final'];
                 // Для тестов возможно не добавлять финальную функцию
                 if (!isset($item['skip']) or !$item['skip']) {
-                    $service = $this->getObjectIfShared($item);
-                    $waterfall->setFinalFunction($this->_buildFunction($item, $service, 'final'));
+                    // Функция будет создана непосредствено перед запуском
+                    $waterfall->setFinalFunction($item);
                 }
             }
             if (isset($streamDescription['error'])) {
                 $item = $streamDescription['error'];
                 // Для тестов возможно не добавлять функцию ошибки
                 if (!isset($item['skip']) or !$item['skip']) {
-                    $service = $this->getObjectIfShared($item);
-                    $waterfall->setErrorFunction($this->_buildFunction($item, $service, 'error'));
+                    // Функция будет создана непосредствено перед запуском
+                    $waterfall->setErrorFunction($item);
                 }
-
             }
             // Функция запускаемая после остановки водопада
             if (isset($streamDescription['stop'])) {
                 $item = $streamDescription['stop'];
-                $service = $this->getObjectIfShared($item);
-                $waterfall->setStopFunction($this->_buildFunction($item, $service, 'stop'));
+                // Функция будет создана непосредствено перед запуском
+                $waterfall->setStopFunction($item);
             }
 
             if (isset($streamDescription['result_shared'])) {
@@ -128,11 +127,26 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
                 $waterfall->setResultShared($streamDescription['result_shared']);
             }
 
+        } else {
+            throw new Exception('Водопада не существует: ' . $name);
         }
 
         return $waterfall;
     }
 
+    /**
+     * Этот метод использует водопад из этой коллекции для отложенного создания функции
+     *
+     * @param $description массив - описание функции водопада
+     * @param null $name
+     * @return callable
+     */
+    public function getFunctionFromDescription($description, $name = null)
+    {
+        $service = $this->getObjectIfShared($description);
+        return $this->_buildFunction($description, $service, $name);
+
+    }
 
     /**
      * @param $item
