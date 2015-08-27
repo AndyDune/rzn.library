@@ -35,7 +35,7 @@ return array(
 
 #### Инъекция 
 
-Инъекции в основном описываются в конфиге вместе и сущностями, к которым они применяются. Сущности: все сервисы (service_manager, helper_manager, custom_service_managers, event_manager), канала медиатори и водопады.
+Инъекции в основном описываются в конфиге вместе c сущностями, к которым они применяются. Сущности: все сервисы (service_manager, helper_manager, custom_service_managers, event_manager), канала медиатора и водопады.
 
 ##### Примеры инъекций
 ```php
@@ -110,4 +110,23 @@ return array(
     ]
 
 ```
-
+Есть возможность делать инъекции через интерфейс:
+```php
+'waterfall' => [
+  'streams' => [
+        'exportOrder' => [
+            'drops' => [
+                'basket_add' => [
+                    'invokable' => 'Rzn\Library\BasketAdd',
+                    'injector' => [
+                        'injectWithInterface' => [
+                            'handler' => 'initializer',
+                        ],
+                    ]
+                ],
+            ]
+        ],
+        ...
+    ]
+]
+```
