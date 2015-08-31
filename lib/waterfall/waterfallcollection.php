@@ -29,6 +29,7 @@
 
 
 namespace Rzn\Library\Waterfall;
+use Rzn\Library\Config;
 use Rzn\Library\ServiceManager\InitializerInterface;
 use Rzn\Library\ServiceManager\ServiceLocatorAwareInterface;
 use Rzn\Library\ServiceManager\ServiceLocatorInterface;
@@ -65,70 +66,132 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
      */
     protected $waterfallConfig;
 
+
     /**
-     * @param $name
-     * @param array $params
-     * @param null $callback
-     */
-    /**
+     * Прямой (рабочий) запуск водопада.
+     * Повторный запуск использует ранее загруженный водопад.
+     *
      * @param $name
      * @param array $params
      * @return Result
      */
     public function execute($name, $params = [])
     {
-        if (!array_key_exists($name, $this->waterfallsLoaded)) {
-            $this->waterfallsLoaded[$name] = $this->loadWaterfall($name);
-        }
-        return $this->waterfallsLoaded[$name]->execute($params);
+        return $this->getWaterfall($name)->execute($params);
     }
 
-    public function loadWaterfall($name)
+    /**
+     * Получить объект водопаджа.
+     * Без указания второго параметра объект сохраняется для следующего запроса.
+     *
+     * Примерная перегрузка данных
+     *
+    $waterfall->getWaterfall('test', [
+                            'drops' => [
+                                'main' => [
+                                    'stop' => 0,
+                                    'skip' => 1
+                                ],
+                                'final' => [
+                                    'skip' => 1
+                                ],
+                                'stop' => [
+                                    'skip' => 1
+                                ],
+                            ]
+                        ])->execute();
+
+     *
+     * @param $name
+     * @param array $params
+     * @param array|null $config Прямая инъекция настроек для перегрузки тех, что из основного конфига берутся
+     * @return Waterfall
+     */
+    public function getWaterfall($name, $config = null)
+    {
+        if ($config and is_array($config)) {
+            /*
+                Передан массив для перегрузки настроек из конфига
+                Не сохраняется для дальнейшего вызова
+            */
+            if (isset($this->waterfallConfig['streams'][$name])) {
+                // Если есть базовое описание водопада - сливаем с явно указанным для запуска
+                if ($this->waterfallConfig['streams'][$name] instanceof Config) {
+                    // Допутим объект Config
+                    $baseConfig = $this->waterfallConfig['streams'][$name]->toArray();
+                } else {
+                    $baseConfig = $this->waterfallConfig['streams'][$name];
+                }
+                $configObject = new Config($baseConfig);
+                $configObject->addConfig($config);
+                $config = $configObject;
+            }
+            $waterfall = $this->loadWaterfall($name, $config);
+        } else if(array_key_exists($name, $this->waterfallsLoaded)) {
+            // Водопад был загружен ранее
+            $waterfall = $this->waterfallsLoaded[$name];
+        } else {
+            // Загрузка и сохранение водопада
+            if (!isset($this->waterfallConfig['streams'][$name])) {
+                throw new Exception('Водопада не существует: ' . $name);
+            }
+            $this->waterfallsLoaded[$name] =
+            $waterfall = $this->loadWaterfall($name, $this->waterfallConfig['streams'][$name]);
+        }
+        return $waterfall;
+    }
+
+    /**
+     * Загрузка водопада.
+     *
+     * @param $name
+     * @param array $streamDescription массив с описанием водопада
+     * @return Waterfall
+     */
+    public function loadWaterfall($name, $streamDescription)
     {
         $waterfall = new Waterfall($name, $this);
-        if (isset($this->waterfallConfig['streams'][$name])) {
-            $streamDescription = $this->waterfallConfig['streams'][$name];
-                foreach($streamDescription['drops'] as $dropName => $item) {
-                    // Для тестов возможно не добавлять дропы в водопад
-                    if (isset($item['skip']) and $item['skip']) {
-                        continue;
-                    }
-                    if (isset($item['stop']) and $item['stop']) {
-                        $waterfall->setStopDropName($dropName);
-                    }
-                    // Создание функции для дропа отклыдывается на момент запуска
-                    $waterfall->addFunction($item, $dropName);
-                }
-            if (isset($streamDescription['final'])) {
-                $item = $streamDescription['final'];
-                // Для тестов возможно не добавлять финальную функцию
-                if (!isset($item['skip']) or !$item['skip']) {
-                    // Функция будет создана непосредствено перед запуском
-                    $waterfall->setFinalFunction($item);
-                }
+        foreach($streamDescription['drops'] as $dropName => $item) {
+            // Для тестов возможно не добавлять дропы в водопад
+            if (isset($item['skip']) and $item['skip']) {
+                continue;
             }
-            if (isset($streamDescription['error'])) {
-                $item = $streamDescription['error'];
-                // Для тестов возможно не добавлять функцию ошибки
-                if (!isset($item['skip']) or !$item['skip']) {
-                    // Функция будет создана непосредствено перед запуском
-                    $waterfall->setErrorFunction($item);
-                }
+            if (isset($item['stop']) and $item['stop']) {
+                $waterfall->setStopDropName($dropName);
             }
-            // Функция запускаемая после остановки водопада
-            if (isset($streamDescription['stop'])) {
-                $item = $streamDescription['stop'];
+            // Создание функции для дропа отклыдывается на момент запуска
+            $waterfall->addFunction($item, $dropName);
+        }
+
+        // Загрузка конечной функции
+        if (isset($streamDescription['final'])) {
+            $item = $streamDescription['final'];
+            // Для тестов возможно не добавлять финальную функцию
+            if (!isset($item['skip']) or !$item['skip']) {
                 // Функция будет создана непосредствено перед запуском
-                $waterfall->setStopFunction($item);
+                $waterfall->setFinalFunction($item);
             }
-
-            if (isset($streamDescription['result_shared'])) {
-                // Включаем запрет сброса объекта результатов между запусками функций водопада.
-                $waterfall->setResultShared($streamDescription['result_shared']);
+        }
+        // Загрузка функции ошибки
+        if (isset($streamDescription['error'])) {
+            $item = $streamDescription['error'];
+            // Для тестов возможно не добавлять функцию ошибки
+            if (!isset($item['skip']) or !$item['skip']) {
+                // Функция будет создана непосредствено перед запуском
+                $waterfall->setErrorFunction($item);
             }
+        }
 
-        } else {
-            throw new Exception('Водопада не существует: ' . $name);
+        // Функция запускаемая после остановки водопада
+        if (isset($streamDescription['stop'])) {
+            $item = $streamDescription['stop'];
+            // Функция будет создана непосредствено перед запуском
+            $waterfall->setStopFunction($item);
+        }
+
+        if (isset($streamDescription['result_shared'])) {
+            // Включаем запрет сброса объекта результатов между запусками функций водопада.
+            $waterfall->setResultShared($streamDescription['result_shared']);
         }
 
         return $waterfall;
@@ -145,7 +208,6 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
     {
         $service = $this->getObjectIfShared($description);
         return $this->_buildFunction($description, $service, $name);
-
     }
 
     /**

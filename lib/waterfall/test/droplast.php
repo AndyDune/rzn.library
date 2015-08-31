@@ -21,8 +21,9 @@ class DropLast
      */
     public function __invoke($params, $result)
     {
-        pr('Последний дроп в серии:' . $result->getCurrentFunction());
-        pr($result->getSharedResults());
+        pr([
+            'message' => 'Последний дроп в серии:' . $result->getCurrentFunction(),
+            'title' => 'Разделемые данные',
+            'data' => $result->getSharedResults()]);
     }
-
 }

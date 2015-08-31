@@ -74,7 +74,7 @@ return array(
             'getFileArray' => 'Rzn\Library\Component\Helper\GetFileArray',
             'printOuterLink' => 'Rzn\Library\Component\Helper\PrintOuterLink',
             'truncateHtml' => 'Rzn\Library\Component\Helper\TruncateHtml',
-            'translate' => 'Rzn\Library\Component\Helper\Translate',
+            //'translate' => 'Rzn\Library\Component\Helper\Translate', // todo удалить  - отменил сей хелпер
             'placeholder' => 'Rzn\Library\Component\Helper\Placeholder',
             'config' => 'Rzn\Library\Component\Helper\Config',
             'isPathBeginWith' => 'Rzn\Library\Component\Helper\IsPathBeginWith'

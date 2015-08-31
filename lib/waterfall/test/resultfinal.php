@@ -21,7 +21,9 @@ class ResultFinal
      */
     public function __invoke($params, $result)
     {
-        pr($result->getSharedResults());
+
+        pr([ 'title' => 'Разделемые данные',
+            'data' => $result->getSharedResults()]);
         pr('Функция нормального завершения: ' . $result->getCurrentFunction());
     }
 }
