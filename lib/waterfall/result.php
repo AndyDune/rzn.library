@@ -145,9 +145,13 @@ class Result implements ArrayAccess
      * Если остались еще дропа на очереди - они пропускаются.
      * Сразу запускается финальная функция если она есть.
      *
+     * @param $finalParams дополнительные пераметры для передачи финальной функции
      */
-    public function finish()
+    public function finish($finalParams = [])
     {
+        if (count($finalParams)) {
+            $this->results = array_merge($this->results, $finalParams);
+        }
         $this->finish = true;
     }
 
