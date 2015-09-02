@@ -245,59 +245,62 @@ class Waterfall
                 }
                 $route = $this->routes[$route];
             }
-            pr($route);
-            $err = null;
-            //pr($this->functions);
-            foreach ($this->functions as $functionName => $function) {
-                // Сброс содержимого объекта результатов
-                if (!$this->resultShared) {
-                    $resultObject->reset();
-                }
-                // Пропуск дропа водапада на указанном маршруте - если маршрут указан
-                if ($route and !in_array($functionName, $route)) {
-                    continue;
-                }
-                // В результат помещаем имя текущей функции - для допустимого дебага
-                $resultObject->setCurrentFunction($functionName);
-                if (!is_callable($function)) {
-                    // Для следующего запуска функция будет уже создана
-                    $this->functions[$functionName] = $function = $this->collection->getFunctionFromDescription($function, 'drop');
-                }
-                $function($params, $resultObject);
-                // Выборка содержимого объекта результатов в виде массива для следующих функций в водопаде
-                $params = $resultObject->getResults();
+            // Ошибка может прийти из селектора маршрута, если он задан
+            $err = $resultObject->getError();
+            if (!$err and !$resultObject->isFinished()) {
+                // Если селектор маршрута не выдал ошибок и не остановил работу водопада
+                foreach ($this->functions as $functionName => $function) {
+                    // Сброс содержимого объекта результатов
+                    if (!$this->resultShared) {
+                        $resultObject->reset();
+                    }
+                    // Пропуск дропа водапада на указанном маршруте - если маршрут указан
+                    if ($route and !in_array($functionName, $route)) {
+                        continue;
+                    }
+                    // В результат помещаем имя текущей функции - для допустимого дебага
+                    $resultObject->setCurrentFunction($functionName);
+                    if (!is_callable($function)) {
+                        // Для следующего запуска функция будет уже создана
+                        $this->functions[$functionName] = $function = $this->collection->getFunctionFromDescription($function, 'drop');
+                    }
+                    $function($params, $resultObject);
+                    // Выборка содержимого объекта результатов в виде массива для следующих функций в водопаде
+                    $params = $resultObject->getResults();
 
-                // В случае останова немедленный возврат объекта результата
-                if ($resultObject->isStopped() or
-                    ($this->stopDropName and $this->stopDropName == $functionName)) {
-                    $resultObject->stop('Остановка по инструкции из конфига.');
-                    if ($func = $this->getStopFunction()) {
-                        if (!$this->resultShared) {
-                            $resultObject->reset();
+                    // В случае останова немедленный возврат объекта результата
+                    if ($resultObject->isStopped() or
+                        ($this->stopDropName and $this->stopDropName == $functionName)
+                    ) {
+                        $resultObject->stop('Остановка по инструкции из конфига.');
+                        if ($func = $this->getStopFunction()) {
+                            if (!$this->resultShared) {
+                                $resultObject->reset();
+                            }
+                            $resultObject->setCurrentFunction('stop');
+                            $func($params, $resultObject);
                         }
-                        $resultObject->setCurrentFunction('stop');
-                        $func($params, $resultObject);
+
+                        return $resultObject;
                     }
 
-                    return $resultObject;
-                }
+                    /*
+                     * Дроп водопада обозначил ошибку.
+                     * Прекращается работа водопада и создается причина для запуска функции ошибки.
+                     */
+                    if ($err = $resultObject->getError()) {
+                        break;
+                    }
 
-                /*
-                 * Дроп водопада обозначио ошибку.
-                 * Прекращается работа водопада и создается причина для запуска функции ошибки.
-                 */
-                if ($err = $resultObject->getError()) {
-                    break;
-                }
+                    /*
+                     * Проверка на прекращение водопада
+                     * В отличие от остановки происходит запуск финальной функции.
+                     */
+                    if ($resultObject->isFinished()) {
+                        break;
+                    }
 
-                /*
-                 * Проверка на прекращение водопада
-                 * В отличие от остановки происходит запуск финальной функции.
-                 */
-                if ($resultObject->isFinished()) {
-                    break;
                 }
-
             }
             if ($err) {
                 if ($func = $this->getErrorFunction()) {
