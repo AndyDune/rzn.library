@@ -30,6 +30,9 @@ return array(
             ,'waterfall'        => 'Rzn\Library\Waterfall\WaterfallCollection'
             ,'injector'        => 'Rzn\Library\Injector\Injector'
             ,'custom_service_managers'  => 'Rzn\Library\ServiceManager\AbstractFactory'
+            // Хранилище данных для передачи между участками кода, есил повляется ткая необходомость
+            // Первое применение: передача параметогм фильтра от умного фильтра к компоненту списка товаров.
+            ,'storage'  => 'Rzn\Library\Storage'
 
         ),
 

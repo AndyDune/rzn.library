@@ -12,8 +12,6 @@
 
 namespace Rzn\Library\Waterfall;
 
-use Rzn\Library\Exception;
-
 class Waterfall
 {
     /**
@@ -48,6 +46,21 @@ class Waterfall
      * @var WaterfallCollection
      */
     protected $collection;
+
+    /**
+     * Хранится функция, которая используется для вычисления маршрута в текущем запуске водопада.
+     * null - нет вычислятора маршрута
+     *
+     * @var null|callable
+     */
+    protected $routeSelectFunction = null;
+
+    /**
+     * Допустимые маршруты.
+     *
+     * @var null|array
+     */
+    protected $routes = null;
 
     public function __construct($name = null, WaterfallCollection $collection)
     {
@@ -103,6 +116,10 @@ class Waterfall
      */
     public function getFinalFunction()
     {
+        if (!$this->finalFunction) {
+            return null;
+        }
+
         if (!is_callable($this->finalFunction)) {
             $this->finalFunction = $this->collection->getFunctionFromDescription($this->finalFunction, 'final');
         }
@@ -126,6 +143,10 @@ class Waterfall
      */
     public function getErrorFunction()
     {
+        if (!$this->errorFunction) {
+            return null;
+        }
+
         if (!is_callable($this->errorFunction)) {
             $this->errorFunction = $this->collection->getFunctionFromDescription($this->errorFunction, 'error');
         }
@@ -143,10 +164,15 @@ class Waterfall
     }
 
     /**
+     * Выбор функции для запуска в конце очереди дропов водопада.
+     *
      * @return null|callable
      */
     public function getStopFunction()
     {
+        if (!$this->stopFunction) {
+            return null;
+        }
         if (!is_callable($this->stopFunction)) {
             $this->stopFunction = $this->collection->getFunctionFromDescription($this->stopFunction, 'stop');
         }
@@ -155,24 +181,82 @@ class Waterfall
     }
 
     /**
+     * Возвращает имя маршрута, который был вычислен в специальной функции
+     * Функция указывается в конфигурации водопада под ключем route_select
+     *
+     * @param $params
+     * @param Result $resultObject
+     * @return null|string имя маршрута
+     */
+    public function getRouteNameSelected($params, $resultObject)
+    {
+        if (!$this->routeSelectFunction) {
+            return null;
+        }
+        /** @var callable $function */
+        $function = $this->routeSelectFunction;
+        return $function($params, $resultObject);
+    }
+
+    /**
+     * Внедрение функции для вычисления текущего маршрута.
+     *
+     * @param callable $function
+     */
+    public function setRouteSelectFunction($function)
+    {
+        $this->routeSelectFunction = $function;
+    }
+
+    /**
+     * Внедрение массива для описания маршрутов водопада.
+     *
+     * @param $array
+     */
+    public function setRoutes($array)
+    {
+        $this->routes = $array;
+    }
+
+
+    /**
      * @param null|array $params
+     * @param null|string $route Имя марштрута для запуска
      * @return Result
      */
-    public function execute($params = null)
+    public function execute($params = null, $route = null)
     {
         try {
-            $err = null;
-            /** @var \Rzn\Library\Waterfall\Result $resultObject */
             $resultObject = new Result();
             if ($this->resultShared) {
                 $resultObject->setResults($params);
             }
+
+            // При запуске водопада явно указан маршрут
+            if ($route) {
+                if (!isset($this->routes[$route])) {
+                    throw new Exception('Нет такого маршрута: ' . $route, 100);
+                }
+                $route = $this->routes[$route];
+            } else if ($route = $this->getRouteNameSelected($params, $resultObject)) {
+                // Выборка маршрута из функции, указанной в конфиге
+                if (!isset($this->routes[$route])) {
+                    throw new Exception('Нет такого маршрута: ' . $route, 100);
+                }
+                $route = $this->routes[$route];
+            }
+            $err = null;
             //pr($this->functions);
             foreach ($this->functions as $functionName => $function) {
                 // Сброс содержимого объекта результатов
                 if (!$this->resultShared) {
                     $resultObject->reset();
                 }
+                // Пропуск дропа водапада на указанном маршруте - если маршрут указан
+                if ($route and !in_array($functionName, $route)) {
+                    continue;
+                }
+                // В результат помещаем имя текущей функции - для допустимого дебага
                 $resultObject->setCurrentFunction($functionName);
                 if (!is_callable($function)) {
                     // Для следующего запуска функция будет уже создана
@@ -237,6 +321,7 @@ class Waterfall
             return $resultObject;
         } catch(Exception $e) {
             // todo добавить действия на ошибки самого водопада
+            echo $e->getMessage();
         }
     }
 }

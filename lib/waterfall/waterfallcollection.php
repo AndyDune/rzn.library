@@ -73,11 +73,12 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
      *
      * @param $name
      * @param array $params
+     * @param string|null $route имя маршрута для запуска
      * @return Result
      */
-    public function execute($name, $params = [])
+    public function execute($name, $params = [], $route = null)
     {
-        return $this->getWaterfall($name)->execute($params);
+        return $this->getWaterfall($name)->execute($params, $route);
     }
 
     /**
@@ -181,6 +182,18 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
                 $waterfall->setErrorFunction($item);
             }
         }
+
+        // Массив с описанием маршрутов.
+        if (isset($streamDescription['routes'])) {
+            $waterfall->setRoutes($streamDescription['routes']);
+        }
+
+        // Функция для вычисления маршрута во время работы водопада.
+        if (isset($streamDescription['route_select'])) {
+            $item = $this->getFunctionFromDescription($streamDescription['route_select']);
+            $waterfall->setRouteSelectFunction($item);
+        }
+
 
         // Функция запускаемая после остановки водопада
         if (isset($streamDescription['stop'])) {
