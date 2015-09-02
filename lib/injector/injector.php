@@ -65,10 +65,12 @@ class Injector implements ServiceLocatorAwareInterface, ConfigServiceAwareInterf
                 throw new Exception('Обработчик инъекции не зарегистрирован: ' . $handler);
             }
 
-            if (!isset($optionValue['options'])) {
-                $optionValue['options'] = null;
+            if (isset($optionValue['options'])) {
+                $optionValueOptions = $optionValue['options'];
+            } else {
+                $optionValueOptions = null;
             }
-            $this->handlerObject[$handler]->execute($object, $optionValue['options']);
+            $this->handlerObject[$handler]->execute($object, $optionValueOptions);
         }
     }
 

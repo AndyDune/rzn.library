@@ -245,6 +245,7 @@ class Waterfall
                 }
                 $route = $this->routes[$route];
             }
+            pr($route);
             $err = null;
             //pr($this->functions);
             foreach ($this->functions as $functionName => $function) {

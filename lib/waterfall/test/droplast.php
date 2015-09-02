@@ -15,6 +15,8 @@ namespace Rzn\Library\Waterfall\Test;
 
 class DropLast 
 {
+    protected $im;
+
     /**
      * @param $params
      * @param \Rzn\Library\Waterfall\Result $result
@@ -25,5 +27,41 @@ class DropLast
             'message' => 'Последний дроп в серии:' . $result->getCurrentFunction(),
             'title' => 'Разделемые данные',
             'data' => $result->getSharedResults()]);
+        $sm = $this->getInnerManager();
+        if ($sm->has('test')) {
+            pr('Есть сообщение');
+        }
+        pr($sm->receive('test', 1));
+        if (!$sm->has('test')) {
+            pr('Нет сообщения');
+        }
+
     }
+
+    public function setIM($service)
+    {
+
+    }
+
+    /**
+     * Внедрение сервиса внутренних сообщений
+     *
+     * @param \Rzn\Library\InnerMessage\Manager $service
+     * @return mixed
+     */
+    public function setInnerManager($service)
+    {
+        $this->im = $service;
+    }
+
+    /**
+     * Получить сервис внутренних сообщений
+     *
+     * @return \Rzn\Library\InnerMessage\Manager
+     */
+    public function getInnerManager()
+    {
+        return $this->im;
+    }
+
 }

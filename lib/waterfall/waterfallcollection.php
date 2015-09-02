@@ -185,7 +185,12 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
 
         // Массив с описанием маршрутов.
         if (isset($streamDescription['routes'])) {
-            $waterfall->setRoutes($streamDescription['routes']);
+            if ($streamDescription['routes'] instanceof Config) {
+                $item = $streamDescription['routes']->toArray();
+            } else {
+                $item = $streamDescription['routes'];
+            }
+            $waterfall->setRoutes($item);
         }
 
         // Функция для вычисления маршрута во время работы водопада.

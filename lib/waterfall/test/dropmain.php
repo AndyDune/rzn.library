@@ -7,19 +7,40 @@
  * | Дата: 13.08.2015
  * ----------------------------------------------------
  *
- */
+ *
+ *
+ *
+ * тестовый скрипт
+        $waterfall->getWaterfall('test', [
+            'drops' => [
+                'main' => [
+                    'stop' => 0,
+                    'skip' => 0
+                ],
+                'final' => [
+                    'skip' => 0
+                ],
+                'stop' => [
+                    'skip' => 0
+                ],
 
+            ]
+        ])->execute();
+*/
 
 namespace Rzn\Library\Waterfall\Test;
 
 use Rzn\Library\ServiceManager\BitrixUserInterface;
+use Rzn\Library\InnerMessage\InnerMessagesAwareInterface;
 
-class DropMain implements BitrixUserInterface
+class DropMain implements BitrixUserInterface, InnerMessagesAwareInterface
 {
     /**
      * @var \CUser
      */
     protected $user;
+
+    protected $im;
 
     /**
      * @param $params
@@ -55,28 +76,42 @@ class DropMain implements BitrixUserInterface
 
                                     'interface' => [
                                         'handler' => 'initializer',
-                                        'options' => []
                                     ],
 
                                 ],
-                                'stop' => false, // true для остановки из конфига
+                                'stop' => 0, // true для остановки из конфига
                             ],
                             'final' => [
                                 'invokable' => 'Rzn\Library\Waterfall\Test\DropFinish',
-                                'skip' => false, // true для пропуска
+                                'skip' => 0, // true для пропуска
                             ],
                             'stop' => [
                                 'invokable' => 'Rzn\Library\Waterfall\Test\DropStop',
-                                'skip' => false, // true для пропуска
+                                'skip' => 1, // true для пропуска
                             ],
                             'last' => [
                                 'invokable' => 'Rzn\Library\Waterfall\Test\DropLast',
+                                'injector' => [
+
+                                    'setIM' => [
+                                        'handler' => 'setter',
+                                        'options' => [
+                                            'set' => 'service',
+                                            'service' => 'inner_messages',
+                                            'method' => 'setInnerManager'
+                                        ]
+                                    ],
+                                ],
                             ],
 
                         ],
                         'error' => ['invokable' => 'Rzn\Library\Waterfall\Test\ResultError'],
                         'final' => ['invokable' => 'Rzn\Library\Waterfall\Test\ResultFinal'],
                         'stop' => ['invokable' => 'Rzn\Library\Waterfall\Test\ResultStop'],
+                        'route_select' => ['invokable' => 'Rzn\Library\Waterfall\Test\RouteSelect'],
+                        'routes' => [
+                            'skip_stop' => ['main', 'last']
+                        ]
                     ]
                 ]
             ]
@@ -90,6 +125,8 @@ class DropMain implements BitrixUserInterface
         pr('Дроп:' . $result->getCurrentFunction());
         // Проверить общий шар
         $result->addSharedResult('key', 'value');
+        $this->getInnerManager()->send('test', ['one', 'two'], '1');
+        $this->getInnerManager()->send('test1', ['one', 'two'], '1');
     }
 
     /**
@@ -121,5 +158,27 @@ class DropMain implements BitrixUserInterface
     {
         pr($v1);
     }
+
+    /**
+     * Внедрение сервиса внутренних сообщений
+     *
+     * @param \Rzn\Library\InnerMessage\Manager $service
+     * @return mixed
+     */
+    public function setInnerManager($service)
+    {
+        $this->im = $service;
+    }
+
+    /**
+     * Получить сервис внутренних сообщений
+     *
+     * @return \Rzn\Library\InnerMessage\Manager
+     */
+    public function getInnerManager()
+    {
+        return $this->im;
+    }
+
 
 }

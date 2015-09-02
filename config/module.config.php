@@ -33,6 +33,7 @@ return array(
             // Хранилище данных для передачи между участками кода, есил повляется ткая необходомость
             // Первое применение: передача параметогм фильтра от умного фильтра к компоненту списка товаров.
             ,'storage'  => 'Rzn\Library\Storage'
+            ,'inner_messages'  => 'Rzn\Library\InnerMessage\Manager'
 
         ),
 
@@ -40,7 +41,8 @@ return array(
             'helper_manager' => 'Rzn\Library\Component\HelperManager',
             'plugin_manager' => 'Rzn\Library\Component\HelperManager',
             'ComponentIncludeWithTemplate' => 'IncludeComponentWithTemplate',
-            'event_manager' => 'Rzn\Library\EventManager\EventManager'
+            'event_manager' => 'Rzn\Library\EventManager\EventManager',
+            'inner_message' => 'inner_messages'
         ),
 
         'initializers' => [
@@ -53,6 +55,7 @@ return array(
             , 'Rzn\Library\Injector\Initializer'
             , 'Rzn\Library\Waterfall\Initializer'
             , 'Rzn\Library\Mediator\Initializer'
+            , 'Rzn\Library\InnerMessage\Initializer'
         ]
     ),
     'view_helpers' => array (

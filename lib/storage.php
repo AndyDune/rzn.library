@@ -38,14 +38,6 @@ class Storage  implements Iterator, ArrayAccess, Countable, InvokeInterface
 
     protected $data = [];
 
-    /**
-     * Иниц. при первом вызове стат. метода и возвращается при последующих
-     *
-     * @var Session
-     * @access private
-     */
-    //static private $instance = NULL;
-
 
     const ZONE_DEFAULT    = 'default____';
 
@@ -57,7 +49,7 @@ class Storage  implements Iterator, ArrayAccess, Countable, InvokeInterface
 
 
     /**
-     * Открывает зону в пространстве сессии
+     * Открывает зону в пространстве данных
      *
      * @param string $zone
      */
@@ -73,7 +65,7 @@ class Storage  implements Iterator, ArrayAccess, Countable, InvokeInterface
     }
 
     /**
-     * Закрывает зону в пространстве сессии, открывая зону по умолчанию.
+     * Закрывает зону в пространстве данных, открывая зону по умолчанию.
      *
      */
     public function closeZone()
@@ -84,7 +76,6 @@ class Storage  implements Iterator, ArrayAccess, Countable, InvokeInterface
 
     /**
      * Блокирование текущей зоны от записи или удаления.
-     * Действует на всём протяжении сесии.
      *
      * @param string $key запирающий ключ
      */
@@ -95,7 +86,6 @@ class Storage  implements Iterator, ArrayAccess, Countable, InvokeInterface
 
     /**
      * Разблокирует зону для записи или удаления.
-     * Действует на всём протяжении сессии.
      *
      *  @param string $key запирающий ключ. Если не совпал - разблокировка не происходит
      */
