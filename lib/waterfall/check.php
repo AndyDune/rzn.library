@@ -42,6 +42,13 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
      */
     protected $waterfall;
 
+
+    /**
+     * @var \Rzn\Library\Injector\Check
+     */
+    protected $injectorCheck;
+
+
     /**
      * Быстрая проверка конфига водопада с печатью отчета.
      * Отчет - это массив с метками.
@@ -55,6 +62,7 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
      */
     public function checkStream($streamDescription)
     {
+        $errors = ['drops' => [], 'final' => 'NO', 'error' => 'NO', 'stop' => 'NO'];
         if (is_string($streamDescription)) {
             // Загрузка и сохранение водопада
             if (!isset($this->waterfallConfig['streams'][$streamDescription])) {
@@ -68,79 +76,83 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
         }
 
         foreach($streamDescription['drops'] as $dropName => $item) {
-            if (isset($item['invokable'])) {
-                if(class_exists($item['invokable'])) {
-                    $streamDescription['drops'][$dropName]['exist'] = 'Класс существует';
-                } else {
-                    $streamDescription['drops'][$dropName]['exist'] = 'Класс НЕ существует';
-                }
-            } else if (isset($item['service'])) {
-                $name = $item['service'];
-                if ($this->getServiceLocator()->has($name)) {
-                    $streamDescription['drops'][$dropName]['exist'] = 'Сервис существует';
-                } else {
-                    $streamDescription['drops'][$dropName]['exist'] = 'Сервис НЕ существует';
-                }
+            $result = $this->checkFunctionDescription($item);
+            if ($result) {
+                $errors['drops'][$dropName] = $result;
+            } else {
+                $errors['drops'][$dropName] = 'OK';
             }
         }
 
         // Проверка конечной функции
         if (isset($streamDescription['final'])) {
             $item = $streamDescription['final'];
-            if (isset($item['invokable'])) {
-                if(class_exists($item['invokable'])) {
-                    $streamDescription['final']['exist'] = 'Класс существует';
-                } else {
-                    $streamDescription['final']['exist'] = 'Класс НЕ существует';
-                }
-            } else if (isset($item['service'])) {
-                $name = $item['service'];
-                if ($this->getServiceLocator()->has($name)) {
-                    $streamDescription['final']['exist'] = 'Сервис существует';
-                } else {
-                    $streamDescription['final']['exist'] = 'Сервис НЕ существует';
-                }
+
+            $result = $this->checkFunctionDescription($item);
+            if ($result) {
+                $errors['final'] = $result;
+            } else {
+                $errors['final'] = 'OK';
             }
+
         }
         // Проверка функции ошибки
         if (isset($streamDescription['error'])) {
             $item = $streamDescription['error'];
-            if (isset($item['invokable'])) {
-                if(class_exists($item['invokable'])) {
-                    $streamDescription['error']['exist'] = 'Класс существует';
-                } else {
-                    $streamDescription['error']['exist'] = 'Класс НЕ существует';
-                }
-            } else if (isset($item['service'])) {
-                $name = $item['service'];
-                if ($this->getServiceLocator()->has($name)) {
-                    $streamDescription['error']['exist'] = 'Сервис существует';
-                } else {
-                    $streamDescription['error']['exist'] = 'Сервис НЕ существует';
-                }
+
+            $result = $this->checkFunctionDescription($item);
+            if ($result) {
+                $errors['error'] = $result;
+            } else {
+                $errors['error'] = 'OK';
             }
+
         }
 
         // Функция запускаемая после остановки водопада
         if (isset($streamDescription['stop'])) {
             $item = $streamDescription['stop'];
-            if (isset($item['invokable'])) {
-                if(class_exists($item['invokable'])) {
-                    $streamDescription['stop']['exist'] = 'Класс существует';
-                } else {
-                    $streamDescription['stop']['exist'] = 'Класс НЕ существует';
-                }
-            } else if (isset($item['service'])) {
-                $name = $item['service'];
-                if ($this->getServiceLocator()->has($name)) {
-                    $streamDescription['stop']['exist'] = 'Сервис существует';
-                } else {
-                    $streamDescription['stop']['exist'] = 'Сервис НЕ существует';
-                }
+
+            $result = $this->checkFunctionDescription($item);
+            if ($result) {
+                $errors['stop'] = $result;
+            } else {
+                $errors['stop'] = 'OK';
             }
 
         }
-        pr($streamDescription);
+        return $errors;
+    }
+
+    public function checkFunctionDescription($item)
+    {
+        $errors = [];
+        $object = null;
+        if (isset($item['invokable'])) {
+            if(!class_exists($item['invokable'])) {
+                $errors[] = 'Класс НЕ существует: ' . $item['invokable'];
+            } else {
+                $class = $item['invokable'];
+                $object = new $class();
+            }
+        } else if (isset($item['service'])) {
+            $name = $item['service'];
+            if (!$this->getServiceLocator()->has($name)) {
+                $errors[] = 'Сервис НЕ существует: ' . $name;
+            } else {
+                $object = $this->getServiceLocator()->get($name);
+            }
+        } else {
+            $errors[] = 'Не указан обязательный ключ в описании';
+        }
+        if ($object) {
+            if (isset($item['injector'])) {
+                $this->getInjectorCheck()->inject($object, $item['injector']);
+                $errors['injector'] = $this->getInjectorCheck()->getCheckResult();
+            }
+        }
+
+        return $errors;
     }
 
     /**
@@ -202,4 +214,15 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
     {
         return $this->waterfall;
     }
+
+    public function setInjectorCheck($service)
+    {
+        $this->injectorCheck = $service;
+    }
+
+    public function getInjectorCheck()
+    {
+        return $this->injectorCheck;
+    }
+
 }

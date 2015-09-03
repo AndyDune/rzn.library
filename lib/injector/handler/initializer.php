@@ -25,9 +25,27 @@ class Initializer implements ServiceLocatorAwareInterface
         $this->injector = $injector;
     }
 
+    /**
+     * Запуск инъекции через иньектор сервисов.
+     *
+     * @param $object
+     * @param $options
+     */
     public function execute($object, $options)
     {
         $this->getServiceLocator()->executeInitialize($object);
+    }
+
+    /**
+     * Заглушка для теста.
+     *
+     * @param $object
+     * @param $options
+     * @return string
+     */
+    public function check($object, $options)
+    {
+        return 'Проверка инъектора через интерфейс не проводится.';
     }
 
     /**

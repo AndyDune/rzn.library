@@ -31,6 +31,34 @@ class Config implements ConfigServiceAwareInterface
         call_user_func([$object, $method], $this->getConfigService()->getNested($params['config']));
     }
 
+
+    /**
+     * Проверка
+     *
+     * @param $object
+     * @param $params
+     * @return array
+     */
+    public function check($object, $params)
+    {
+        $errors = [];
+        if (isset($params['method'])) {
+            $method = $params['method'];
+        } else {
+            $method = 'set' . ucfirst($params['set']);
+        }
+        if (!method_exists($object, $method)) {
+            $errors[] = 'Суюъект инъекции (' . get_class($object) . ') не имеет целевого метода: ' . $method;
+        }
+        if (!isset($params['config'])) {
+            $errors[] = 'В инструкции инъектора не задан важный парамтер config';
+        }
+        if ($this->getConfigService()->getNested($params['config']) === null) {
+            $errors[] = 'Конфигурация ' . $params['config'] . ' возвращает NULL';
+        }
+        return $errors;
+    }
+
     /**
      * @return \Rzn\Library\Config
      */

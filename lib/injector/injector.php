@@ -70,8 +70,21 @@ class Injector implements ServiceLocatorAwareInterface, ConfigServiceAwareInterf
             } else {
                 $optionValueOptions = null;
             }
-            $this->handlerObject[$handler]->execute($object, $optionValueOptions);
+            //$this->handlerObject[$handler]->execute($object, $optionValueOptions);
+            $this->_executeInject($this->handlerObject[$handler], $object, $optionValueOptions);
         }
+    }
+
+    /**
+     * Для перегрузки в тестовом скрипте
+     *
+     * @param $handler
+     * @param $object
+     * @param $optionValueOptions
+     */
+    protected function _executeInject($handler, $object, $optionValueOptions)
+    {
+        $handler->execute($object, $optionValueOptions);
     }
 
     public function initServicesFromConfig()

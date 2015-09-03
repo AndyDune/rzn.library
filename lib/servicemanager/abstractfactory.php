@@ -52,7 +52,14 @@ class AbstractFactory implements ConfigServiceAwareInterface
         $object->setConfig($this->servicesConfig[$serviceManagerName]);
         $this->serviceManagers[$serviceManagerName] = $object;
         return $object;
+    }
 
+    public function has($serviceManagerName)
+    {
+        if (isset($this->servicesConfig[$serviceManagerName])) {
+            return true;
+        }
+        return false;
     }
 
     /**

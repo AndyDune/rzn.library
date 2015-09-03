@@ -48,6 +48,40 @@ class CustomService implements ServiceLocatorAwareInterface
     }
 
     /**
+     * Проверка
+     *
+     * @param $object
+     * @param $params
+     * @return array
+     */
+    public function check($object, $params)
+    {
+        $errors = [];
+        if (isset($params['method'])) {
+            $method = $params['method'];
+        } else {
+            $method = 'setCustomService';
+        }
+        if (!method_exists($object, $method)) {
+            $errors[] = 'Субъект инъекции (' . get_class($object) . ') не имеет целевого метода: ' . $method;
+        }
+        if (!isset($params['manager']) or !isset($params['service'])) {
+            $errors[] = 'Для инъектора не указаны обязательные параметры: manager и(или) service';
+            return $errors;
+        }
+        if (!$this->customServiceManager->has($params['manager'])) {
+            $errors[] = 'Собственного менеджера сервисов не существует: ' . $params['manager'];
+            return $errors;
+        }
+
+        if (!$this->customServiceManager->get($params['manager'])->has($params['service'])) {
+            $errors[] = 'Сервиса ' . $params['service'] . ' в собственном менеджере сервисов ' . $params['manager'] . ' не существует';
+        }
+
+        return $errors;
+    }
+
+    /**
      * Внедрение сервис локатора
      *
      * @param ServiceLocatorInterface $serviceLocator

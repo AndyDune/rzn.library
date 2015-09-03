@@ -95,4 +95,35 @@ class Setter
         }
         return $this->setterHandlersObjects[$name];
     }
+
+    /**
+     * Проверка инъекции
+     *
+     * @param $object
+     * @param $options
+     * @return null|string
+     * @throws Exception
+     */
+    public function check($object, $options)
+    {
+        $errors = null;
+        if (!isset($options['set'])) {
+            $errors = 'Не указана обязательная опция set.';
+            return $errors;
+        }
+        if (!isset($this->setterHandlers[$options['set']])) {
+            $errors = 'Указан невозможный параметр set: ' . $options['set'];
+            return $errors;
+        }
+
+        $handler = $this->getHandlerObject($options['set']);
+
+        if (method_exists($handler, 'check')) {
+            $errors = $handler->check($object, $options);
+        } else {
+            $errors = 'Сеттер обработчика инъекции не имеет проверочного метода ' . get_class($handler);
+        }
+        return $errors;
+    }
+
 }
