@@ -54,7 +54,7 @@ class Check extends Injector
                 $optionValueOptions = null;
             }
             //$this->handlerObject[$handler]->execute($object, $optionValueOptions);
-            $this->_executeInject($this->handlerObject[$handler], $object, $optionValueOptions);
+            $this->errors[$optionName] = $this->_executeInject($this->handlerObject[$handler], $object, $optionValueOptions);
         }
     }
 
@@ -72,7 +72,7 @@ class Check extends Injector
         } else {
             $errors = 'Обработчик инъекции не имеет проверочного метода ' . get_class($handler);
         }
-        $this->errors = $errors;
+        return $errors;
     }
 
     public function getCheckResult()
