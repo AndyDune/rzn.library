@@ -200,9 +200,9 @@ $saveMorepicture = new Rzn\Library\BitrixTrial\Iblock\MultiFileProperty($config-
 $saveMorepicture->setPropertyCode('more_picture')
     ->setElementId($ID)
     ->setMaxImages($maxImagesCount)
-    ->setDescriptionArray($_POST['description']['more_picture'])
-    ->setSortArray($_POST['order']['more_picture'])
-    ->setDeleteArray($_POST['delete_image']['more_picture'])
+    ->setDescriptionArray($_POST['description']['more_picture']) // <input type="text" name="description[more_picture][3025]"  value="Картинка">
+    ->setSortArray($_POST['order']['more_picture'])<input type="text" name="order[more_picture][3025]" value="100">
+    ->setDeleteArray($_POST['delete_image']['more_picture']) // <input type="hidden" value="0" name="delete_image[more_picture][3025]">
     ->setFilesArray($filesMorePicture, 'VALUE') // Внедрение нормализованого массива с данными из формы
     ->save()
 ;
