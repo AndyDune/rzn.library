@@ -373,6 +373,8 @@ class MultiFileProperty
                 }
             }
 
+            $item['VALUE']['description'] = $item['DESCRIPTION'];
+            //pr($value);
             if ($this->isNumber($key)) {
                 // Обновлять данные нужно обязательно с цифрой, которая хранится за ключем PROPERTY_VALUE_ID
                 if (isset($existData[$key])) {
