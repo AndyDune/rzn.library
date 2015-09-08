@@ -171,3 +171,46 @@ local/config/local.config.php содержит
     ]
 ]
 ```
+
+#### Специальный обработчик множественного свойтсва картинки
+Задача: сохранять картинки с формы с контролем максимального их числа, с указанием описания и сортировки:
+
+##### Скрипт сохранения
+```php
+
+$filesArrayNormalize = function($files) {
+    $result = array();
+
+    foreach($files as $nameOption => $array1) {
+        foreach($array1 as $id => $array2) {
+            foreach($array2 as $nameField => $value) {
+                if (!isset($result[$id])) {
+                    $result[$id] = array();
+                }
+                $result[$id][$nameField][$nameOption] = $value;
+            }
+        }
+    }
+    return $result;
+};
+
+$filesMorePicture = $filesArrayNormalize($_FILES['image']); // <input type="file" name="image[more_picture][3025]">
+
+$saveMorepicture = new Rzn\Library\BitrixTrial\Iblock\MultiFileProperty($config->getNested('infoblocks.ids.shops'));
+$saveMorepicture->setPropertyCode('more_picture')
+    ->setElementId($ID)
+    ->setMaxImages($maxImagesCount)
+    ->setDescriptionArray($_POST['description']['more_picture']) // <input type="text" name="description[more_picture][3025]"  value="Картинка">
+    ->setSortArray($_POST['order']['more_picture'])<input type="text" name="order[more_picture][3025]" value="100">
+    ->setDeleteArray($_POST['delete_image']['more_picture']) // <input type="hidden" value="0" name="delete_image[more_picture][3025]">
+    ->setFilesArray($filesMorePicture, 'VALUE') // Внедрение нормализованого массива с данными из формы
+    ->save()
+;
+```
+##### Выборка отсортированных даных
+```php
+$saveMorepicture = new Rzn\Library\BitrixTrial\Iblock\MultiFileProperty($config->getNested('infoblocks.ids.shops'));
+$saveMorepicture->setPropertyCode('more_picture');
+$saveMorepicture->setElementId($ID);
+$morePictures = $saveMorepicture->extractSorted(); // Массив готовый для участия в выводе картинок
+```
