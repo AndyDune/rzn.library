@@ -62,6 +62,11 @@ class Waterfall
      */
     protected $routes = null;
 
+    /**
+     * @var \Rzn\Library\Config
+     */
+    protected $config;
+
     public function __construct($name = null, WaterfallCollection $collection)
     {
         $this->name = $name;
@@ -220,6 +225,29 @@ class Waterfall
 
 
     /**
+     * Внедрение конфига с описание этого водопада.
+     * Это тоолько часть конфига сайта.
+     *
+     * @param \Rzn\Library\Config $config
+     */
+    public function setConfig($config)
+    {
+        $this->config = $config;
+    }
+
+    /**
+     * Возвращает конфиг с описанием текущего водопада.
+     * Используется в классе Result для организации доступа из любой функции к конфигу.
+     *
+     * @return \Rzn\Library\Config
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+
+    /**
      * @param null|array $params
      * @param null|string $route Имя марштрута для запуска
      * @return Result
@@ -227,7 +255,7 @@ class Waterfall
     public function execute($params = null, $route = null)
     {
         try {
-            $resultObject = new Result();
+            $resultObject = new Result($this);
             if ($this->resultShared) {
                 $resultObject->setResults($params);
             }

@@ -58,6 +58,30 @@ class Result implements ArrayAccess
      */
     protected $stop = null;
 
+    /**
+     * @var Waterfall
+     */
+    protected $waterfall;
+
+    public function __construct($waterfall)
+    {
+        $this->waterfall = $waterfall;
+    }
+
+    /**
+     *
+     *
+     * @param null $nestString
+     * @return array|null|\Rzn\Library\Config
+     */
+    public function getConfig($nestString = null)
+    {
+        if ($nestString) {
+            return $this->waterfall->getConfig()->getNested($nestString);
+        }
+        return $this->waterfall->getConfig();
+    }
+
     public function setError($error)
     {
         if ($error instanceof Error) {

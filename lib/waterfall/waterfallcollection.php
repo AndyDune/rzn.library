@@ -152,6 +152,7 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
     public function loadWaterfall($name, $streamDescription)
     {
         $waterfall = new Waterfall($name, $this);
+        $waterfall->setConfig($streamDescription);
         foreach($streamDescription['drops'] as $dropName => $item) {
             // Для тестов возможно не добавлять дропы в водопад
             if (isset($item['skip']) and $item['skip']) {
