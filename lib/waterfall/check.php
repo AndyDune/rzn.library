@@ -16,7 +16,7 @@ use Rzn\Library\Config;
 use Rzn\Library\ServiceManager\ServiceLocatorAwareInterface;
 use Rzn\Library\ServiceManager\ServiceLocatorInterface;
 use Rzn\Library\ServiceManager\ConfigServiceAwareInterface;
-
+use ReflectionMethod;
 
 class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
 {
@@ -62,7 +62,7 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
      */
     public function checkStream($streamDescription)
     {
-        $errors = ['drops' => [], 'final' => 'NO', 'error' => 'NO', 'stop' => 'NO'];
+        $errors = ['drops' => [], 'final' => 'NO', 'error' => 'NO', 'stop' => 'NO', 'route_select' => 'NO'];
         if (is_string($streamDescription)) {
             // Загрузка и сохранение водопада
             if (!isset($this->waterfallConfig['streams'][$streamDescription])) {
@@ -119,8 +119,23 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
             } else {
                 $errors['stop'] = 'OK';
             }
+        }
+
+
+        // Функция для вычисления маршрута
+        if (isset($streamDescription['route_select'])) {
+            $item = $streamDescription['route_select'];
+
+            $result = $this->checkFunctionDescription($item);
+            if ($result) {
+                $errors['route_select'] = $result;
+            } else {
+                $errors['route_select'] = 'OK';
+            }
 
         }
+
+
         return $errors;
     }
 
@@ -145,8 +160,45 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
         } else {
             $errors[] = 'Не указан обязательный ключ в описании';
         }
+
         if ($object) {
+            $method = '';
+            if (isset($item['method'])) {
+                if (!method_exists($object, $item['method'])) {
+                    $errors[] = 'Объект поставщик функции для водопада (' . get_class($object) . ') не имеет метода: ' . $item['method'];
+                } else {
+                    $method = $item['method'];
+                }
+
+            } else if (!is_callable($object) and !($object instanceof WaterfallInitializationAwareInterface)) {
+                $errors[] = 'Объект поставщик функции для водопада не может быть вызван как функция и не имеет интерфейс WaterfallInitializationAwareInterface';
+            } else if (is_callable($object)) {
+                $method = '__invoke';
+            } else if ($object instanceof WaterfallInitializationAwareInterface) {
+                $function = $object->getFunctionForWaterfall();
+                if (!is_callable($function)) {
+                    $errors[] = 'Метод getFunctionForWaterfall интерфейса WaterfallInitializationAwareInterface должен возвращать анонимную функцию.';
+                } else {
+                    $reflect = new \ReflectionFunction($function);
+                    if ($reflect->getNumberOfParameters() < 2) {
+                        $errors[] = 'Метод getFunctionForWaterfall вернул функцию с менее чем 2-мя аргументами.';
+                    }
+
+                }
+            }
+
+            if ($method) {
+                $reflect = new ReflectionMethod($object, $method);
+                if ($reflect->getNumberOfParameters() < 2) {
+                    $errors[] = 'Метод ' . $method  . ' имеет мало аргументов. Должно быть как минимум 2.';
+                }
+            }
+
             if (isset($item['injector'])) {
+                if (!$errors) {
+                    $errors[] = 'OK';
+                }
+
                 $this->getInjectorCheck()->inject($object, $item['injector']);
                 $errors['injector'] = $this->getInjectorCheck()->getCheckResult();
             }

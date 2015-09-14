@@ -48,7 +48,7 @@ class Config implements ConfigServiceAwareInterface
             $method = 'set' . ucfirst($params['set']);
         }
         if (!method_exists($object, $method)) {
-            $errors[] = 'Суюъект инъекции (' . get_class($object) . ') не имеет целевого метода: ' . $method;
+            $errors[] = 'Субъект инъекции (' . get_class($object) . ') не имеет целевого метода: ' . $method;
         }
         if (!isset($params['config'])) {
             $errors[] = 'В инструкции инъектора не задан важный парамтер config';

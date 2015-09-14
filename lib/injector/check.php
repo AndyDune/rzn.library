@@ -20,6 +20,7 @@ class Check extends Injector
 
     public function inject($object, $options = null)
     {
+        $this->errors = null;
         if ($this->needInit) {
             $this->initServicesFromConfig();
             $this->needInit = false;
@@ -69,6 +70,9 @@ class Check extends Injector
     {
         if (method_exists($handler, 'check')) {
             $errors = $handler->check($object, $optionValueOptions);
+            if (!$errors) {
+                $errors = 'OK';
+            }
         } else {
             $errors = 'Обработчик инъекции не имеет проверочного метода ' . get_class($handler);
         }
