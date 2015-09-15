@@ -30,7 +30,7 @@
 namespace Rzn\Library\ServiceManager;
 use Rzn\Library\Exception;
 
-class AbstractFactory implements ConfigServiceAwareInterface
+class AbstractFactory implements ConfigServiceAwareInterface, ServiceLocatorAwareInterface
 {
     protected $config;
 
@@ -38,6 +38,8 @@ class AbstractFactory implements ConfigServiceAwareInterface
 
     protected $serviceManagers = [];
 
+
+    protected $serviceManager;
 
     public function get($serviceManagerName)
     {
@@ -49,6 +51,9 @@ class AbstractFactory implements ConfigServiceAwareInterface
             throw new Exception('Менеджера сервисов не существует: ' . $serviceManagerName, 100);
         }
         $object = new ServiceManager();
+        // Встраиваем основной менеджер сервисов
+        $object->setServiceLocator($this->getServiceLocator());
+
         $object->setConfig($this->servicesConfig[$serviceManagerName]);
         $this->serviceManagers[$serviceManagerName] = $object;
         return $object;
@@ -70,7 +75,7 @@ class AbstractFactory implements ConfigServiceAwareInterface
      */
     public function setConfigService($service)
     {
-        $this->config = $service;
+        //$this->config = $service;
         if (isset($service['custom_service_managers'])) {
             $this->servicesConfig = $service['custom_service_managers'];
         }
@@ -85,5 +90,26 @@ class AbstractFactory implements ConfigServiceAwareInterface
     {
         return $this->configService;
     }
+
+    /**
+     * Внедрение сервис локатора
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     */
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->serviceManager = $serviceLocator;
+    }
+
+    /**
+     * Возврат сервис локатора.
+     *
+     * @return ServiceLocatorInterface
+     */
+    public function getServiceLocator()
+    {
+        return $this->serviceManager;
+    }
+
 
 }
