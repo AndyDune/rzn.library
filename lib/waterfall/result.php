@@ -174,6 +174,9 @@ class Result implements ArrayAccess
     public function finish($finalParams = [])
     {
         if (count($finalParams)) {
+            if (!is_array($this->results)) {
+                $this->results = [];
+            }
             $this->results = array_merge($this->results, $finalParams);
         }
         $this->finish = true;
@@ -224,6 +227,14 @@ class Result implements ArrayAccess
     public function getSharedResults()
     {
         return $this->sharedResults;
+    }
+
+    public function getSharedResult($key)
+    {
+        if (isset($this->sharedResults[$key])) {
+            return $this->sharedResults[$key];
+        }
+        return null;
     }
 
     public function setResults($results)
