@@ -11,6 +11,7 @@
 
 
 namespace Rzn\Library\Waterfall;
+use Rzn\Library\Config;
 
 class Waterfall
 {
@@ -71,6 +72,8 @@ class Waterfall
     {
         $this->name = $name;
         $this->collection = $collection;
+        // инициилизируем для запуска водопада без коллекциии
+        $this->config = new Config();
     }
 
     /**
