@@ -14,6 +14,7 @@ namespace Rzn\Library\Waterfall;
 
 use ArrayAccess;
 use Rzn\Library\Format\ArrayModification;
+use Rzn\Library\Config;
 
 class Result implements ArrayAccess
 {
@@ -61,9 +62,9 @@ class Result implements ArrayAccess
     /**
      * @var Waterfall
      */
-    protected $waterfall;
+    protected $waterfall = null;
 
-    public function __construct($waterfall)
+    public function __construct($waterfall = null)
     {
         $this->waterfall = $waterfall;
     }
@@ -76,6 +77,9 @@ class Result implements ArrayAccess
      */
     public function getConfig($nestString = null)
     {
+        if (!$this->waterfall) {
+            return new Config([]);
+        }
         if ($nestString) {
             return $this->waterfall->getConfig()->getNested($nestString);
         }
