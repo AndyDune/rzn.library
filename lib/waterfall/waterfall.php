@@ -73,7 +73,7 @@ class Waterfall
         $this->name = $name;
         $this->collection = $collection;
         // инициилизируем для запуска водопада без коллекциии
-        $this->config = new Config();
+        $this->config = new Config([]);
     }
 
     /**
