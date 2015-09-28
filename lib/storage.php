@@ -16,7 +16,7 @@ use ArrayAccess;
 use Countable;
 use InvokeInterface;
 
-class Storage  implements Iterator, ArrayAccess, Countable, InvokeInterface
+class Storage  implements Iterator, ArrayAccess, Countable
 {
     /**
      * Используемая в данный момент зона
