@@ -269,12 +269,17 @@ class Waterfall
                     throw new Exception('Нет такого маршрута: ' . $route, 100);
                 }
                 $route = $this->routes[$route];
-            } else if ($route = $this->getRouteNameSelected($params, $resultObject)) {
-                // Выборка маршрута из функции, указанной в конфиге
-                if (!isset($this->routes[$route])) {
-                    throw new Exception('Нет такого маршрута: ' . $route, 100);
+            } else if ($this->routeSelectFunction) {
+                $route = $this->getRouteNameSelected($params, $resultObject);
+                // Функция возврата маршрута может маршрут не возвращать, но устанавливать параметры
+                $params = $resultObject->getResults();
+                if ($route) {
+                    // Выборка маршрута из функции, указанной в конфиге
+                    if (!isset($this->routes[$route])) {
+                        throw new Exception('Нет такого маршрута: ' . $route, 100);
+                    }
+                    $route = $this->routes[$route];
                 }
-                $route = $this->routes[$route];
             }
             // Ошибка может прийти из селектора маршрута, если он задан
             $err = $resultObject->getError();
