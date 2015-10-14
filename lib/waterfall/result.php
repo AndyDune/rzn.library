@@ -77,7 +77,11 @@ class Result implements ArrayAccess
      */
     public function getConfig($nestString = null)
     {
+        // При отдельном использовании объекта результатов - нет привязанного водопада
         if (!$this->waterfall) {
+            if ($nestString) {
+                return null;
+            }
             return new Config([]);
         }
         if ($nestString) {

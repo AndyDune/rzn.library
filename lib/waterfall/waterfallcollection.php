@@ -161,6 +161,12 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
             if (isset($item['stop']) and $item['stop']) {
                 $waterfall->setStopDropName($dropName);
             }
+
+            // В конфиге есть параметры для дропа по-умолчанию.
+            if (isset($item['params']) and $item['params']) {
+                $waterfall->setDropParams($dropName, $item['params']);
+            }
+
             // Создание функции для дропа отклыдывается на момент запуска
             $waterfall->addFunction($item, $dropName);
         }

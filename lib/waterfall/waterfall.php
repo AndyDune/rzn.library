@@ -68,12 +68,37 @@ class Waterfall
      */
     protected $config;
 
+    /**
+     * Параметры дропа по-умолчанию.
+     *
+     * @var array
+     */
+    protected $defaultDropParams = [];
+
     public function __construct($name = null, WaterfallCollection $collection)
     {
         $this->name = $name;
         $this->collection = $collection;
         // инициилизируем для запуска водопада без коллекциии
         $this->config = new Config([]);
+    }
+
+    /**
+     * Внедрение для дропа собственных параметров.
+     * Свои парамтеры функция дропа получает от предудущего или использует входные.
+     * Эта функция определяет параметры по-умолчанию. Эти параметры замещаются настоящими при их наличии.
+     *
+     * Так же сие полезно для тестирования.
+     *
+     * @param $name
+     * @param $params
+     */
+    public function setDropParams($name, $params)
+    {
+        if ($params instanceof Config) {
+            $params = $params->toArray();
+        }
+        $this->defaultDropParams[$name] = $params;
     }
 
     /**
@@ -272,7 +297,7 @@ class Waterfall
             } else if ($this->routeSelectFunction) {
                 $route = $this->getRouteNameSelected($params, $resultObject);
                 // Функция возврата маршрута может маршрут не возвращать, но устанавливать параметры
-                $params = $resultObject->getResults();
+                $params = array_merge($params, $resultObject->getResults());
                 if ($route) {
                     // Выборка маршрута из функции, указанной в конфиге
                     if (!isset($this->routes[$route])) {
@@ -300,6 +325,12 @@ class Waterfall
                         // Для следующего запуска функция будет уже создана
                         $this->functions[$functionName] = $function = $this->collection->getFunctionFromDescription($function, 'drop');
                     }
+
+                    if (isset($this->defaultDropParams[$functionName])) {
+                        // Для дропа есть параметры по-умолчанию
+                        $params = array_merge($this->defaultDropParams[$functionName], $params);
+                    }
+
                     $function($params, $resultObject);
                     // Выборка содержимого объекта результатов в виде массива для следующих функций в водопаде
                     $params = $resultObject->getResults();
