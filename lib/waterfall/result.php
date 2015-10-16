@@ -213,7 +213,7 @@ class Result implements ArrayAccess
      *
      * @param $results
      */
-    public function setSharedResult($results)
+    public function setSharedResults($results)
     {
         $this->sharedResults = $results;
         return $this;
