@@ -29,6 +29,38 @@ class Service implements ServiceLocatorAwareInterface
     }
 
     /**
+     * Проверка
+     *
+     * @param $object
+     * @param $params
+     * @return array
+     */
+    public function check($object, $params)
+    {
+        $errors = [];
+        if (isset($params['method'])) {
+            $method = $params['method'];
+        } else {
+            $method = 'set' . ucfirst($params['set']);
+        }
+
+        if (!method_exists($object, $method)) {
+            $errors[] = 'Субъект инъекции (' . get_class($object) . ') не имеет целевого метода: ' . $method;
+        }
+
+        if (empty($params['service'])) {
+            $errors[] = 'Не указан обязательный параметр: service';
+        }
+
+
+        if (!$this->getServiceLocator()->has($params['service'])) {
+            $errors[] = 'Такого сервиса не существует: ' . $params['service'];
+        }
+
+        return $errors;
+    }
+
+    /**
      * Внедрение сервис локатора
      *
      * @param ServiceLocatorInterface $serviceLocator
