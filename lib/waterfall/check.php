@@ -59,8 +59,9 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
      * Оттуда и выбирается описание
      *
      * @param string|array|Config $streamDescription
+     * @param null|array $config добавочный конфиг к описанному
      */
-    public function checkStream($streamDescription)
+    public function checkStream($streamDescription, $config = null)
     {
         $errors = ['drops' => [], 'final' => 'NO', 'error' => 'NO', 'stop' => 'NO', 'route_select' => 'NO'];
         if (is_string($streamDescription)) {
@@ -72,6 +73,9 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
             $streamDescription = $this->waterfallConfig['streams'][$streamDescription];
             if ($streamDescription instanceof Config) {
                 $streamDescription = $streamDescription->toArray();
+            }
+            if ($config) {
+                $streamDescription = array_merge_recursive($streamDescription, $config);
             }
         }
 
