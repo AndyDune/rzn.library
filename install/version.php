@@ -1,7 +1,7 @@
 <?
 $arModuleVersion = array(
-    "VERSION" => "2.12.14",
-    "VERSION_DATE" => "2015-11-06 15:30:00"
+    "VERSION" => "2.13.0",
+    "VERSION_DATE" => "2015-11-09 15:30:00"
 );
 /**
  * Позиции в коде версии:
@@ -11,6 +11,9 @@ $arModuleVersion = array(
  */
 
 /**
+ *
+ * 2.13.0
+ * Добаил события битрикса в систему iblock_OnStartIBlockElementUpdate и iblock_OnStartIBlockElementAdd
  *
  * 2.12.14
  * В метод проверки описания водопада дрбавлен второй параметр  - массив для перегрузки настоящего описания водопада.

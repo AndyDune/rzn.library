@@ -84,6 +84,14 @@ class BitrixEventsDrive implements ServiceLocatorAwareInterface
         $eventManager->addEventHandlerCompatible("main", "OnBeforeLocalRedirect", array(__CLASS__, 'OnBeforeLocalRedirect'), false, 100);
 
 
+
+        // iblock_OnStartIBlockElementAdd
+        $eventManager->addEventHandlerCompatible("iblock", "OnStartIBlockElementAdd", array(__CLASS__, 'OnStartIBlockElementAdd'), false, 100);
+
+        // iblock_OnStartIBlockElementUpdate
+        $eventManager->addEventHandlerCompatible("iblock", "OnStartIBlockElementUpdate", array(__CLASS__, 'OnStartIBlockElementUpdate'), false, 100);
+
+
         // sale_OnSaleComponentOrderOneStepPaySystem
         $eventManager->addEventHandlerCompatible("sale", "OnSaleComponentOrderOneStepPaySystem",
             array(__CLASS__, 'onSaleComponentOrderOneStepPaySystem'), false, 100);
@@ -249,6 +257,37 @@ class BitrixEventsDrive implements ServiceLocatorAwareInterface
             return false;
         }
     }
+
+    public static function OnStartIBlockElementUpdate(&$arFields)
+    {
+        $eventManager = self::$eventManager;
+        $arFields = $eventManager->prepareArgs($arFields);
+
+        $res = $eventManager->trigger('iblock_OnStartIBlockElementUpdate', self::$instance, $arFields);
+        $arFields = $arFields->getArrayCopy();
+        if ($res->stopped()) {
+            $app = Registry::getApplication();
+            $app->ThrowException($res->last());
+            return false;
+        }
+
+    }
+
+    public static function OnStartIBlockElementAdd(&$arFields)
+    {
+        $eventManager = self::$eventManager;
+        $arFields = $eventManager->prepareArgs($arFields);
+
+        $res = $eventManager->trigger('iblock_OnStartIBlockElementAdd', self::$instance, $arFields);
+        $arFields = $arFields->getArrayCopy();
+        if ($res->stopped()) {
+            $app = Registry::getApplication();
+            $app->ThrowException($res->last());
+            return false;
+        }
+
+    }
+
 
     public static function OnBeforeIBlockElementUpdate(&$arFields)
     {
