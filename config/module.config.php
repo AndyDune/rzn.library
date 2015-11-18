@@ -9,6 +9,22 @@
   *
   */
 return array(
+    'mediator' => [
+        'channels' => [
+            // Выборка списка вариантов свойства инфоблока
+            'getIBlockPropertyEnum' =>
+                [
+                    // Подробное описание в классе
+                    'invokable' => 'Rzn\Library\BitrixTrial\Iblock\EnumVariantsPropertyHolder',
+                    'injector' => [
+                        'init' => [
+                            'handler' => 'initializer',
+                        ],
+                    ]
+                ],
+        ]
+    ],
+
     'service_manager' => array(
         'factories' => array(
             'Rzn\Library\Component\HelperManager' => 'Rzn\Library\Component\HelperManagerFactory',
@@ -28,7 +44,20 @@ return array(
             ,'completion_tasks' => 'Rzn\Library\CompletionTasks'
             ,'mediator'         => 'Rzn\Library\Mediator\Mediator'
             ,'waterfall'        => 'Rzn\Library\Waterfall\WaterfallCollection'
+            ,'waterfall_check'  => ['name' => 'Rzn\Library\Waterfall\Check',
+                'injector' => [
+                    'injectCheck' => [
+                        'handler' => 'setter',
+                        'options' => [
+                            'set' => 'service',
+                            'service' => 'injector_check',
+                            'method' => 'setInjectorCheck'
+                        ]
+                    ]
+                ]
+            ]
             ,'injector'        => 'Rzn\Library\Injector\Injector'
+            ,'injector_check'        => 'Rzn\Library\Injector\Check'
             ,'custom_service_managers'  => 'Rzn\Library\ServiceManager\AbstractFactory'
             // Хранилище данных для передачи между участками кода, есил повляется ткая необходомость
             // Первое применение: передача параметогм фильтра от умного фильтра к компоненту списка товаров.

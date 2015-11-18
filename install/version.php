@@ -1,7 +1,7 @@
 <?
 $arModuleVersion = array(
-    "VERSION" => "2.13.0",
-    "VERSION_DATE" => "2015-11-09 15:30:00"
+    "VERSION" => "2.14.0",
+    "VERSION_DATE" => "2015-11-18 15:05:00"
 );
 /**
  * Позиции в коде версии:
@@ -11,6 +11,9 @@ $arModuleVersion = array(
  */
 
 /**
+ *
+ * 2.14.0
+ * Добавлен Медиатор getIBlockPropertyEnum для выборки списка вариантов свойства инфоблока.
  *
  * 2.13.0
  * Добаил события битрикса в систему iblock_OnStartIBlockElementUpdate и iblock_OnStartIBlockElementAdd
