@@ -37,6 +37,11 @@ class IncludeWithTemplate implements InvokeInterface
 
     public function __invoke($name, $params = [])
     {
+        return $this->includeComponent($name, $params);
+    }
+
+    public function includeComponent($name, $params = [])
+    {
         $this->_params = $params;
 
         $path = $_SERVER['DOCUMENT_ROOT'] . '/local/templates/' . SITE_TEMPLATE_ID . '/include/component/' . $name . '.php';
