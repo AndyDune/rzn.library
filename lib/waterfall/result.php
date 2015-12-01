@@ -13,6 +13,7 @@
 namespace Rzn\Library\Waterfall;
 
 use ArrayAccess;
+use Rzn\Library\Exception;
 use Rzn\Library\Format\ArrayModification;
 use Rzn\Library\Config;
 
@@ -33,6 +34,8 @@ class Result implements ArrayAccess
      * @var array
      */
     protected $sharedResults = [];
+
+    protected $sharedResultsReadOnly = [];
 
     protected $error = null;
 
@@ -215,6 +218,10 @@ class Result implements ArrayAccess
      */
     public function setSharedResults($results)
     {
+        if ($this->sharedResultsReadOnly) {
+            throw new Exception('Есть поля только для чтения - нельзя заменить все.');
+        }
+
         $this->sharedResults = $results;
         return $this;
     }
@@ -224,10 +231,17 @@ class Result implements ArrayAccess
      *
      * @param $key
      * @param $value
+     * @param $readOnly установить для выключения повторной записи разделяемого свойства
      * @return $this
      */
-    public function addSharedResult($key, $value)
+    public function addSharedResult($key, $value, $readOnly = false)
     {
+        if (isset($this->sharedResultsReadOnly[$key])) {
+            throw new Exception('Разделяемый параметр только для чтения');
+        }
+        if ($readOnly) {
+            $this->sharedResultsReadOnly[$key] = true;
+        }
         $this->sharedResults[$key] = $value;
         return $this;
     }
