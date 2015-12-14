@@ -48,6 +48,22 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
      */
     protected $injectorCheck;
 
+    protected $errors = [];
+
+
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    public function addError($error)
+    {
+        if (is_array($error)) {
+            $this->errors = array_merge($this->errors, $error);
+        } else {
+            $this->errors[] = $error;
+        }
+    }
 
     /**
      * Быстрая проверка конфига водопада с печатью отчета.
@@ -63,6 +79,7 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
      */
     public function checkStream($streamDescription, $config = null)
     {
+        $this->errors = [];
         $errors = ['drops' => [], 'final' => 'NO', 'error' => 'NO', 'stop' => 'NO', 'route_select' => 'NO'];
         if (is_string($streamDescription)) {
             // Загрузка и сохранение водопада
@@ -165,6 +182,11 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
             $errors[] = 'Не указан обязательный ключ в описании';
         }
 
+        if (count($errors)) {
+            $this->addError($errors);
+            return $errors;
+        }
+
         if ($object) {
             $method = '';
             if (isset($item['method'])) {
@@ -198,6 +220,7 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
                 }
             }
 
+            $this->addError($errors);
             if (isset($item['injector'])) {
                 if (!$errors) {
                     $errors[] = 'OK';
