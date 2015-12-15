@@ -88,12 +88,19 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
                 return;
             }
             $streamDescription = $this->waterfallConfig['streams'][$streamDescription];
+            if ($config) {
+                if ($streamDescription instanceof Config) {
+                    $streamDescription = clone($streamDescription);
+                } else {
+                    $streamDescription = new Config($streamDescription);
+                }
+                $streamDescription->addConfig($config);
+            }
+
             if ($streamDescription instanceof Config) {
                 $streamDescription = $streamDescription->toArray();
             }
-            if ($config) {
-                $streamDescription = array_merge_recursive($streamDescription, $config);
-            }
+
         }
 
         foreach($streamDescription['drops'] as $dropName => $item) {

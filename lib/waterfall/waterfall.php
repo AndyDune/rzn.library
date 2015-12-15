@@ -328,6 +328,9 @@ class Waterfall
 
                     if (isset($this->defaultDropParams[$functionName])) {
                         // Для дропа есть параметры по-умолчанию
+                        if (!$params) {
+                            $params = [];
+                        }
                         $params = array_merge($this->defaultDropParams[$functionName], $params);
                     }
 
