@@ -96,7 +96,6 @@ class WaterfallTest extends PHPUnit_Framework_TestCase
         // Проверка работы пропуска дропа при перегрузке параметров
         $result = $waterfall->getWaterfall('auto_test', [
             'drops' => [
-                'true'  => ['invokable' => 'Rzn\Library\Test\Waterfall\SetParamsTrue'],
                 'false' => ['skip' => true],
             ]
         ])->execute();
