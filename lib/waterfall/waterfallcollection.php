@@ -171,6 +171,10 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
             $waterfall->addFunction($item, $dropName);
         }
 
+        if (isset($streamDescription['params'])) {
+            $waterfall->setInputParams($streamDescription['params']);
+        }
+
         // Загрузка конечной функции
         if (isset($streamDescription['final'])) {
             $item = $streamDescription['final'];

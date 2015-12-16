@@ -12,9 +12,11 @@
 
 namespace Rzn\Library\Waterfall;
 use Rzn\Library\Config;
+use Rzn\Library\Format\ArrayMergeTrait;
 
 class Waterfall
 {
+    use ArrayMergeTrait;
     /**
      * Название описанного в конфиге водопада.
      *
@@ -75,6 +77,8 @@ class Waterfall
      */
     protected $defaultDropParams = [];
 
+    protected $inputParams = null;
+
     public function __construct($name = null, WaterfallCollection $collection)
     {
         $this->name = $name;
@@ -100,6 +104,20 @@ class Waterfall
         }
         $this->defaultDropParams[$name] = $params;
     }
+
+    /**
+     * Установка входных параметров по-умолчанию.
+     *
+     * @param $params
+     */
+    public function setInputParams($params)
+    {
+        if ($params instanceof Config) {
+            $params = $params->toArray();
+        }
+        $this->inputParams = $params;
+    }
+
 
     /**
      * Установка имени дропа послок которого нужно остановить выполненеие водопада.
@@ -283,6 +301,10 @@ class Waterfall
     public function execute($params = null, $route = null)
     {
         try {
+            if ($this->inputParams) {
+                $params = $this->arrayMerge($this->inputParams, $params);
+            }
+
             $resultObject = new Result($this);
             if ($this->resultShared) {
                 $resultObject->setResults($params);
@@ -297,7 +319,7 @@ class Waterfall
             } else if ($this->routeSelectFunction) {
                 $route = $this->getRouteNameSelected($params, $resultObject);
                 // Функция возврата маршрута может маршрут не возвращать, но устанавливать параметры
-                $params = array_merge($params, $resultObject->getResults());
+                $params = $this->arrayMerge($params, $resultObject->getResults());
                 if ($route) {
                     // Выборка маршрута из функции, указанной в конфиге
                     if (!isset($this->routes[$route])) {
@@ -328,10 +350,7 @@ class Waterfall
 
                     if (isset($this->defaultDropParams[$functionName])) {
                         // Для дропа есть параметры по-умолчанию
-                        if (!$params) {
-                            $params = [];
-                        }
-                        $params = array_merge($this->defaultDropParams[$functionName], $params);
+                        $params = $this->arrayMerge($this->defaultDropParams[$functionName], $params);
                     }
 
                     $function($params, $resultObject);

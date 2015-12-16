@@ -16,9 +16,11 @@ use ArrayAccess;
 use Rzn\Library\Exception;
 use Rzn\Library\Format\ArrayModification;
 use Rzn\Library\Config;
+use Rzn\Library\Format\ArrayMergeTrait;
 
 class Result implements ArrayAccess
 {
+    use ArrayMergeTrait;
     /**
      * Результат работы фуккции водопада.
      * По умолчанию значение этой переменной передается следующей функции и сбрасывается перед передачей объекта следующей.
@@ -188,7 +190,7 @@ class Result implements ArrayAccess
             if (!is_array($this->results)) {
                 $this->results = [];
             }
-            $this->results = array_merge($this->results, $finalParams);
+            $this->results = $this->arrayMerge($this->results, $finalParams);
         }
         $this->finish = true;
     }
@@ -328,9 +330,13 @@ class Result implements ArrayAccess
      */
     public function offsetGet($offset)
     {
+        if ($result = $this->getSharedResult($offset)) {
+            return $result;
+        }
         if (isset($this->results[$offset])) {
             return $this->results[$offset];
         }
+        $this->getSharedResult($offset);
         return null;
 
     }

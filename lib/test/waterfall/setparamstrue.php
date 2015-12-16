@@ -24,6 +24,10 @@ class SetParamsTrue
         if (isset($params['callback']) and is_callable($params['callback'])) {
             call_user_func($params['callback'], $result);
         }
+        if (isset($params['input'])) {
+            $result['input'] = $params['input'];
+        }
+
         $result['x'] = true;
         $result['y'] = true;
     }

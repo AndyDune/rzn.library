@@ -22,6 +22,7 @@ class DoNothing
     public function __invoke($params, $result)
     {
         $result['do nothing'] = 'do nothing';
+        $result['share']     = 'current';
     }
 
 }

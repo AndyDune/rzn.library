@@ -81,6 +81,13 @@ class WaterfallTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(false === $result['x']);
         $this->assertTrue(null === $result['y'], 'Параметры в этой конфигурации не должны разделяться между дропами');
 
+
+        // Провека разделяемых данных
+        $result = $waterfall->getWaterfall('auto_test', [
+            'result_shared' => true
+        ])->execute();
+        $this->assertTrue(true === $result['y'], 'Этот параметр должен сохраниться.');
+
         // Проверка передачи параметра по умолчанию в дроп и проверка работы разделяемых параметров
         $result = $waterfall->getWaterfall('auto_test', [
             'drops' => [
@@ -91,7 +98,17 @@ class WaterfallTest extends PHPUnit_Framework_TestCase
             ]
         ])->execute();
         $this->assertTrue('share' === $result->getSharedResult('share'));
+        $this->assertTrue('share' === $result['share'], 'К разделяемым параметрам можно получить доступ как к обычным');
+        $this->assertFalse('current' === $result['share'], 'Разделяемые параметры имеют приоритет перед одноименными обычными параметрами');
         $this->assertTrue('do nothing' === $result['do nothing'], 'Второй дроп был перегружен в конфигурации');
+
+        // Проверка передачи параметра по умолчанию в дроп и проверка работы разделяемых параметров
+        $result = $waterfall->getWaterfall('auto_test', [
+            'drops' => [
+                'false' => ['invokable' => 'Rzn\Library\Test\Waterfall\DoNothing'],
+            ]
+        ])->execute();
+        $this->assertTrue('current' === $result['share'], 'Нет разделяемого параметра - должны получать значение обычного');
 
         // Проверка работы пропуска дропа при перегрузке параметров
         $result = $waterfall->getWaterfall('auto_test', [
@@ -99,8 +116,16 @@ class WaterfallTest extends PHPUnit_Framework_TestCase
                 'false' => ['skip' => true],
             ]
         ])->execute();
+        $this->assertTrue('default' === $result['input'], 'Должен быть параметр по умолчанию');
         $this->assertTrue(true === $result['x'], 'Был установлен в дропе true');
         $this->assertTrue(true === $result['y'], 'Второй дроп был пропущен - параметр остался не сброшенным');
+
+        $result = $waterfall->getWaterfall('auto_test', [
+            'drops' => [
+                'false' => ['skip' => true],
+            ]
+        ])->execute(['input' => 'current']);
+        $this->assertTrue('current' === $result['input'], 'Параметр по-умолчанию перегружен');
 
     }
 }

@@ -4,11 +4,31 @@
   * | Автор: Андрей Рыжов (Dune) <info@rznw.ru>         |
   * | Сайт: www.rznw.ru                                 |
   * | Телефон: +7 (4912) 51-10-23                       |
-  * | Дата: 01.11.14                                      
+  * | Дата: 01.11.14
   * ----------------------------------------------------
   *
   */
 return array(
+    'waterfall' => [
+        'streams' => [
+            'auto_test' => [
+                'drops' => [
+                    'true'  => ['invokable' => 'Rzn\Library\Test\Waterfall\SetParamsTrue'],
+                    'false' => ['invokable' => 'Rzn\Library\Test\Waterfall\SetParamsFalse'],
+                    'trueSkip'  => [
+                        'invokable' => 'Rzn\Library\Test\Waterfall\SetParamsTrue',
+                        'skip' => true
+                    ],
+                ],
+                // Включает разделение данных между дропами
+                'result_shared' => false,
+                // Входные параметры по умолчанию.
+                'params' => [
+                    'input' => 'default'
+                ]
+            ]
+        ]
+    ],
     'mediator' => [
         'channels' => [
             // Выборка списка вариантов свойства инфоблока
