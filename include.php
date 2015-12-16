@@ -101,27 +101,60 @@ IncludeModuleLangFile(__FILE__);
 
 use Rzn\Library\Registry;
 
-
-$config = new Rzn\Library\Config([]);
-$config->addModule('rzn.library');
-
 $sm = Registry::getServiceManager();
-$sm->setService('config', $config);
+
 // Сам у себя менеджер сервисов
 $sm->setServiceLocator($sm);
 
 $sm->setAllowOverride(true);
 
+$fileAllowCache = __DIR__ . '/../../config/cache.php';
+if (file_exists($fileAllowCache)) {
+    $cacheAllow = true;
+} else {
+    $cacheAllow = false;
+}
 
+$cacheObjectCreate = function() {
+    $config = new Rzn\Library\Config([]);
+    $config->addModule('rzn.library');
+    $config->addApplication();
 
-$config->addApplication();
+    if ($config['modules'] and count($config['modules'])) {
+        foreach ($config['modules'] as $module) {
+            $config->addModule($module);
+        }
+    }
+    return $config;
+};
+
+if ($cacheAllow) {
+    $cache = Bitrix\Main\Data\Cache::createInstance();
+    $cacheId = 'rzn_config';
+    $config = null;
+
+    if ($cache->initCache(360000, $cacheId, $cacheId)) {
+        $res = $cache->getVars();
+        if ($res and isset($res['config'])) {
+            $config = $res['config'];
+        }
+    }
+    if (!$config) {
+        $config = $cacheObjectCreate();
+        $cache->startDataCache(360000, $cacheId, $cacheId);
+        $cache->endDataCache(array("config" => $config));
+    }
+} else {
+    $config = $cacheObjectCreate();
+}
 
 if ($config['modules'] and count($config['modules'])) {
     foreach ($config['modules'] as $module) {
         Loader::includeModule($module);
-        $config->addModule($module);
     }
 }
+
+$sm->setService('config', $config);
 
 if ($config['add_config'] and count($config['add_config'])) {
 
