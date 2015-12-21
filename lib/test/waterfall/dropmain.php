@@ -28,12 +28,12 @@
         ])->execute();
 */
 
-namespace Rzn\Library\Waterfall\Test;
+namespace Rzn\Library\Test\Waterfall;
 
 use Rzn\Library\ServiceManager\BitrixUserInterface;
 use Rzn\Library\InnerMessage\InnerMessagesAwareInterface;
 
-class DropMain implements BitrixUserInterface, InnerMessagesAwareInterface
+class DropMain implements BitrixUserInterface
 {
     /**
      * @var \CUser
@@ -42,13 +42,17 @@ class DropMain implements BitrixUserInterface, InnerMessagesAwareInterface
 
     protected $im;
 
+    protected $twoParams = null;
+
+    protected $oneParam = null;
+
     /**
      * @param $params
      * @param \Rzn\Library\Waterfall\Result $result
      */
     public function __invoke($params, $result)
     {
-        // Базовый массив для
+        // Пример массива для описания
         $array = [
             'waterfall' => [
                 'streams' => [
@@ -118,15 +122,11 @@ class DropMain implements BitrixUserInterface, InnerMessagesAwareInterface
         ];
 
 
-        $user = $this->getUser();
-        if (is_object($user)) {
-            pr('Нормально прошла инъекция через интерфейс');
-        }
-        pr('Дроп:' . $result->getCurrentFunction());
-        // Проверить общий шар
-        $result->addSharedResult('key', 'value');
-        $this->getInnerManager()->send('test', ['one', 'two'], '1');
-        $this->getInnerManager()->send('test1', ['one', 'two'], '1');
+        $result->addSharedResult('user', $this->getUser());
+
+        $result->addSharedResult('two_params', $this->getTwoParams());
+        $result->addSharedResult('one_param',  $this->getOneParam());
+
     }
 
     /**
@@ -151,34 +151,22 @@ class DropMain implements BitrixUserInterface, InnerMessagesAwareInterface
 
     public function setTwoParams($v1, $v2)
     {
-        pr([$v1, $v2]);
+        $this->twoParams = [$v1, $v2];
     }
+
+    public function getTwoParams()
+    {
+        return $this->twoParams;
+    }
+
 
     public function setOneParam($v1)
     {
-        pr($v1);
+        $this->oneParam = $v1;
     }
 
-    /**
-     * Внедрение сервиса внутренних сообщений
-     *
-     * @param \Rzn\Library\InnerMessage\Manager $service
-     * @return mixed
-     */
-    public function setInnerManager($service)
+    public function getOneParam()
     {
-        $this->im = $service;
+        return $this->oneParam;
     }
-
-    /**
-     * Получить сервис внутренних сообщений
-     *
-     * @return \Rzn\Library\InnerMessage\Manager
-     */
-    public function getInnerManager()
-    {
-        return $this->im;
-    }
-
-
 }

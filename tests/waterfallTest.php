@@ -81,6 +81,12 @@ class WaterfallTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(false === $result['x']);
         $this->assertTrue(null === $result['y'], 'Параметры в этой конфигурации не должны разделяться между дропами');
 
+        // Проверки передачи параметров в дроп
+        $user = Registry::getUser();
+        $this->assertTrue($user == $result['user'], 'Не произошло инъекции');
+        $this->assertTrue(['v1', 'v2'] == $result['two_params'], 'Несколько параметров передаются в метод как отдельные параметры');
+        $this->assertTrue(['vv1', 'vv2'] == $result['one_param'], 'Массив передается как один параметр.');
+
 
         // Провека разделяемых данных
         $result = $waterfall->getWaterfall('auto_test', [
@@ -113,6 +119,7 @@ class WaterfallTest extends PHPUnit_Framework_TestCase
         // Проверка работы пропуска дропа при перегрузке параметров
         $result = $waterfall->getWaterfall('auto_test', [
             'drops' => [
+                'main' => ['skip' => true],
                 'false' => ['skip' => true],
             ]
         ])->execute();
@@ -122,6 +129,7 @@ class WaterfallTest extends PHPUnit_Framework_TestCase
 
         $result = $waterfall->getWaterfall('auto_test', [
             'drops' => [
+                'main' => ['skip' => true],
                 'false' => ['skip' => true],
             ]
         ])->execute(['input' => 'current']);

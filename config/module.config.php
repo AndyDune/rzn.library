@@ -13,6 +13,35 @@ return array(
         'streams' => [
             'auto_test' => [
                 'drops' => [
+
+                    'main' => [
+                        'invokable' => 'Rzn\Library\Test\Waterfall\DropMain',
+                        'injector' => [
+                            'setParams' => [
+                                'handler' => 'setter',
+                                'options' => [
+                                    'set' => 'params',
+                                    'params' => ['v1', 'v2'],
+                                    'method' => 'setTwoParams'
+                                ]
+                            ],
+                            'setParam' => [
+                                'handler' => 'setter',
+                                'options' => [
+                                    'set' => 'params',
+                                    'param' => ['vv1', 'vv2'],
+                                    'method' => 'setOneParam'
+                                ]
+                            ],
+
+                            'interface' => [
+                                'handler' => 'initializer',
+                            ],
+
+                        ],
+                        'stop' => 0, // true для остановки из конфига
+                    ],
+
                     'true'  => ['invokable' => 'Rzn\Library\Test\Waterfall\SetParamsTrue'],
                     'false' => ['invokable' => 'Rzn\Library\Test\Waterfall\SetParamsFalse'],
                     'trueSkip'  => [
