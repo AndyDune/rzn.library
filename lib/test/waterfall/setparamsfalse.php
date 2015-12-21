@@ -25,6 +25,7 @@ class SetParamsFalse implements WaterfallInitializationAwareInterface
     public function doIt($params, $result)
     {
         $result['x'] = false;
+        $result->addSharedResult('drop_false', true);
     }
 
     /**

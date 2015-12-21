@@ -49,6 +49,11 @@ return array(
                         'skip' => true
                     ],
                 ],
+                'route_select' => ['invokable' => 'Rzn\Library\Test\Waterfall\RouteSelect'],
+                'routes' => [
+                    'no_true' => ['main', 'false']
+                ],
+
                 // Включает разделение данных между дропами
                 'result_shared' => false,
                 // Входные параметры по умолчанию.

@@ -159,5 +159,13 @@ class WaterfallTest extends PHPUnit_Framework_TestCase
             ]
         ])->execute();
         $this->assertTrue('shared' === $result['callable'], 'Разделяемый результат имеет больший приоритет');
+
+        // Проверка работы маршрутов
+        $result = $waterfall->execute('auto_test');
+        $this->assertTrue(true === $result['drop_true'], 'Пропущен дроп водопада true');
+
+        $result = $waterfall->execute('auto_test', ['route' => 'no_true']);
+        $this->assertTrue(null === $result['drop_true'], 'Дроп водопада true не пропущен');
+        $this->assertTrue(true === $result['drop_false'], '');
     }
 }

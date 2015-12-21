@@ -10,7 +10,7 @@
   */
 
 
-namespace Rzn\Library\Waterfall\Test;
+namespace Rzn\Library\Test\Waterfall;
 
 
 class RouteSelect 
@@ -21,8 +21,11 @@ class RouteSelect
      */
     public function __invoke($params, $result)
     {
-        pr('Запуск селектора маршрута');
-        return 'skip_stop';
+        if (isset($params['route']) and $params['route']) {
+            return $params['route'];
+        }
+        // Без явного маршрута
+        return null;
     }
 
 }

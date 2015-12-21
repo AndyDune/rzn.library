@@ -30,5 +30,6 @@ class SetParamsTrue
 
         $result['x'] = true;
         $result['y'] = true;
+        $result->addSharedResult('drop_true', true);
     }
 }
