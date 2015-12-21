@@ -127,5 +127,29 @@ class WaterfallTest extends PHPUnit_Framework_TestCase
         ])->execute(['input' => 'current']);
         $this->assertTrue('current' === $result['input'], 'Параметр по-умолчанию перегружен');
 
+        // Проверка callable перегрузку
+        $result = $waterfall->getWaterfall('auto_test', [
+            'drops' => [
+                'false' => ['callable' => function($params, $result) {
+                    $result['callable'] = 'yes';
+                }],
+            ]
+        ])->execute();
+        $this->assertTrue(null === $result['x'], 'Оригинального дропа false больше нет');
+        $this->assertTrue('yes' === $result['callable'], 'Был установлен в дропе false');
+
+        // Разделяемые данные имеют приоритет перед обычными
+        $result = $waterfall->getWaterfall('auto_test', [
+            'drops' => [
+                'true' => ['callable' => function($params, $result) {
+                    $result->addSharedResult('callable', 'shared');
+                }],
+
+                'false' => ['callable' => function($params, $result) {
+                    $result['callable'] = 'yes';
+                }],
+            ]
+        ])->execute();
+        $this->assertTrue('shared' === $result['callable'], 'Разделяемый результат имеет больший приоритет');
     }
 }

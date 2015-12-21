@@ -336,9 +336,7 @@ class Result implements ArrayAccess
         if (isset($this->results[$offset])) {
             return $this->results[$offset];
         }
-        $this->getSharedResult($offset);
         return null;
-
     }
 
     /**
