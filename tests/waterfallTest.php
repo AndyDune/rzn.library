@@ -12,6 +12,7 @@
 namespace Rzn\Library\Tests;
 use Rzn\Library\Registry;
 use PHPUnit_Framework_TestCase;
+use Rzn\Library\Waterfall\Exception;
 
 class WaterfallTest extends PHPUnit_Framework_TestCase
 {
@@ -167,5 +168,15 @@ class WaterfallTest extends PHPUnit_Framework_TestCase
         $result = $waterfall->execute('auto_test', ['route' => 'no_true']);
         $this->assertTrue(null === $result['drop_true'], 'Дроп водопада true не пропущен');
         $this->assertTrue(true === $result['drop_false'], '');
+
+        // Ошибка при несущетсвующем маршруте
+        $erorrCode = 0;
+        try {
+            $waterfall->execute('auto_test', ['route' => 'no']);
+        } catch (Exception $e) {
+            $erorrCode = $e->getCode();
+        }
+        $this->assertEquals(100, $erorrCode, 'Должно произойти исключение');
+
     }
 }

@@ -413,8 +413,9 @@ class Waterfall
             }
             return $resultObject;
         } catch(Exception $e) {
-            // todo добавить действия на ошибки самого водопада
-            echo $e->getMessage();
+            // todo возможно усовершенствовать реакцию на ошибки - пока отправка ошибки наружу
+            throw new Exception($e->getMessage(), $e->getCode());
+            //echo $e->getMessage();
         }
     }
 }
