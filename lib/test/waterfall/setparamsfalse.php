@@ -25,6 +25,12 @@ class SetParamsFalse implements WaterfallInitializationAwareInterface
     public function doIt($params, $result)
     {
         $result['x'] = false;
+
+        // Проверка доступа к разделяемым параметрам как к обыкновенным
+        if (isset($params['drop_true'])) {
+            $result->addSharedResult('param_drop_true', true);
+        }
+
         $result->addSharedResult('drop_false', true);
     }
 

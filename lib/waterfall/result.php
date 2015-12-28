@@ -266,11 +266,25 @@ class Result implements ArrayAccess
         $this->results = $results;
     }
 
+    /**
+     * Возврат результатов.
+     * Обычные результаты перегружаются разделяемыми.
+     *
+     * В основном используется для передачи параметров следующей фунции водопада.
+     *
+     * @return array
+     */
     public function getResults()
     {
-        return $this->results;
+        $results = $this->getSharedResults();
+        return $this->arrayMerge($this->results, $results);
     }
 
+    /**
+     * Сброс параметров водопада.
+     * Используется в водопаде для сброса параметров при отключении разделения параметров.
+     * По умолчанию разделение параметров в водопаде отключено.
+     */
     public function reset()
     {
         $this->results = [];

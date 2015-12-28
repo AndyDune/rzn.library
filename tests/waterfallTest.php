@@ -79,6 +79,7 @@ class WaterfallTest extends PHPUnit_Framework_TestCase
         /** @var \Rzn\Library\Waterfall\WaterfallCollection $waterfall */
         $waterfall = $sm->get('waterfall');
         $result = $waterfall->execute('auto_test');
+        $this->assertTrue(true === $result['param_drop_true'], 'Разделяемым параметр не был встроен в массив $params');
         $this->assertTrue(false === $result['x']);
         $this->assertTrue(null === $result['y'], 'Параметры в этой конфигурации не должны разделяться между дропами');
 
