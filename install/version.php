@@ -1,7 +1,7 @@
 <?
 $arModuleVersion = array(
-    "VERSION" => "2.17.1",
-    "VERSION_DATE" => "2015-12-28 11:20:00"
+    "VERSION" => "2.17.2",
+    "VERSION_DATE" => "2016-01-15 17:00:00"
 );
 /**
  * Позиции в коде версии:
