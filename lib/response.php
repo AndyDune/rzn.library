@@ -201,6 +201,13 @@ class Response implements \Iterator, \ArrayAccess, \Countable, ServiceLocatorAwa
         return $this->layout;
     }
 
+    public function getData()
+    {
+        $array = $this->array;
+        $array['html'] = $this->mainContent;
+        return $array;
+    }
+
     /**
      * Включено ли ранее использования ответа json.
      * Включено, если добавлены данные при отсутствии явного запрета за json.

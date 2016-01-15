@@ -4,11 +4,65 @@
   * | Автор: Андрей Рыжов (Dune) <info@rznw.ru>         |
   * | Сайт: www.rznw.ru                                 |
   * | Телефон: +7 (4912) 51-10-23                       |
-  * | Дата: 01.11.14                                      
+  * | Дата: 01.11.14
   * ----------------------------------------------------
   *
   */
 return array(
+    'waterfall' => [
+        'streams' => [
+            'auto_test' => [
+                'drops' => [
+
+                    'main' => [
+                        'invokable' => 'Rzn\Library\Test\Waterfall\DropMain',
+                        'injector' => [
+                            'setParams' => [
+                                'handler' => 'setter',
+                                'options' => [
+                                    'set' => 'params',
+                                    'params' => ['v1', 'v2'],
+                                    'method' => 'setTwoParams'
+                                ]
+                            ],
+                            'setParam' => [
+                                'handler' => 'setter',
+                                'options' => [
+                                    'set' => 'params',
+                                    'param' => ['vv1', 'vv2'],
+                                    'method' => 'setOneParam'
+                                ]
+                            ],
+
+                            'interface' => [
+                                'handler' => 'initializer',
+                            ],
+
+                        ],
+                        'stop' => 0, // true для остановки из конфига
+                    ],
+
+                    'true'  => ['invokable' => 'Rzn\Library\Test\Waterfall\SetParamsTrue'],
+                    'false' => ['invokable' => 'Rzn\Library\Test\Waterfall\SetParamsFalse'],
+                    'trueSkip'  => [
+                        'invokable' => 'Rzn\Library\Test\Waterfall\SetParamsTrue',
+                        'skip' => true
+                    ],
+                ],
+                'route_select' => ['invokable' => 'Rzn\Library\Test\Waterfall\RouteSelect'],
+                'routes' => [
+                    'no_true' => ['main', 'false']
+                ],
+
+                // Включает разделение данных между дропами
+                'result_shared' => false,
+                // Входные параметры по умолчанию.
+                'params' => [
+                    'input' => 'default'
+                ]
+            ]
+        ]
+    ],
     'mediator' => [
         'channels' => [
             // Выборка списка вариантов свойства инфоблока

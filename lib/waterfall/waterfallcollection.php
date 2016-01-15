@@ -171,6 +171,10 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
             $waterfall->addFunction($item, $dropName);
         }
 
+        if (isset($streamDescription['params'])) {
+            $waterfall->setInputParams($streamDescription['params']);
+        }
+
         // Загрузка конечной функции
         if (isset($streamDescription['final'])) {
             $item = $streamDescription['final'];
@@ -232,7 +236,7 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
     public function getFunctionFromDescription($description, $name = null)
     {
         $service = $this->getObjectIfShared($description);
-        return $this->_buildFunction($description, $service, $name);
+        return $this->buildFunction($description, $service, $name);
     }
 
     /**
@@ -241,9 +245,9 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
      * @param Waterfall $waterfall
      * @param string $type
      */
-    protected function _buildFunction($item, $service, $type = 'drop')
+    protected function buildFunction($item, $service, $type = 'drop')
     {
-        if (isset($item['method'])) {
+        if (isset($item['method']) and is_object($service)) {
             // Указан явно метод слушателя, который надо запустить
             return function ($params, $resultObject) use ($item, $service) {
                 return call_user_func([$service, $item['method']], $params, $resultObject);
@@ -269,7 +273,10 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
      */
     protected function getObjectIfShared($channelRetriever)
     {
-        if (isset($channelRetriever['invokable'])) {
+        if (isset($channelRetriever['callable'])) {
+            // Только в целях теста
+            $object = $channelRetriever['callable'];
+        } else if (isset($channelRetriever['invokable'])) {
             $name = $channelRetriever['invokable'];
             $object = new $name();
             // Обработка нового объеката иньектором

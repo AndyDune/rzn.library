@@ -18,8 +18,27 @@ class Check extends Injector
     protected $errors = null;
 
 
+    protected $errorsTotal = [];
+
+
+    public function getErrors()
+    {
+        return $this->errorsTotal;
+    }
+
+    public function addError($error)
+    {
+        if (is_array($error)) {
+            $this->errorsTotal = array_merge($this->errorsTotal, $error);
+        } else {
+            $this->errorsTotal[] = $error;
+        }
+    }
+
+
     public function inject($object, $options = null)
     {
+        $this->errorsTotal = [];
         $this->errors = null;
         if ($this->needInit) {
             $this->initServicesFromConfig();
@@ -41,10 +60,12 @@ class Check extends Injector
             } else if (isset($optionValue['handler'])) {
                 $handler = $optionValue['handler'];
             } else {
+                $this->addError('Обработчик инъекции не указан.');
                 $this->errors[$optionName] = 'Обработчик инъекции не указан.';
                 continue;
             }
             if (!isset($this->handlerObject[$handler])) {
+                $this->addError('Обработчик инъекции не зарегистрирован: ' . $handler);
                 $this->errors[$optionName] = 'Обработчик инъекции не зарегистрирован: ' . $handler;
                 continue;
             }
@@ -72,6 +93,8 @@ class Check extends Injector
             $errors = $handler->check($object, $optionValueOptions);
             if (!$errors) {
                 $errors = 'OK';
+            } else {
+                $this->addError($errors);
             }
         } else {
             $errors = 'Обработчик инъекции не имеет проверочного метода ' . get_class($handler);
