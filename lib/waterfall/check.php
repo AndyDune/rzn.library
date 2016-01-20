@@ -85,7 +85,7 @@ class Check implements ServiceLocatorAwareInterface, ConfigServiceAwareInterface
             // Загрузка и сохранение водопада
             if (!isset($this->waterfallConfig['streams'][$streamDescription])) {
                 $this->errors[] = 'Водопад не найден: ' . $streamDescription;
-                return;
+                return $this->errors;
             }
             $streamDescription = $this->waterfallConfig['streams'][$streamDescription];
             if ($config) {
