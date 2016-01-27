@@ -52,12 +52,41 @@ class ArrayModification extends PHPUnit_Framework_TestCase
             'no_id' => 31,
             'id3' => 3
         ];
+
         $my = new ArrayModificationTest($data);
 
         $my->keysLeave(['id', 'id3']);
 
         $data = $my->get();
         $this->assertEquals(2, count($data));
+
+
+        $data = [
+            'html1' => '<p>a</p>',
+            'html2' => '<p>b</p>',
+        ];
+
+        $my = new ArrayModificationTest($data);
+        $my->addFilterCallback(function($value, $key){
+            return strip_tags($value);
+        });
+        $data = $my->filter()->get();
+        $this->assertEquals('a', $data['html1']);
+        $this->assertEquals('b', $data['html2']);
+
+        $data = [
+            'html1' => '<p>a</p>',
+            'html2' => '<p>b</p>',
+        ];
+
+        $my = new ArrayModificationTest($data);
+        $my->addFilterCallback(function($value, $key){
+            return strip_tags($value);
+        }, 'html1');
+        $data = $my->filter()->get();
+        $this->assertEquals('a', $data['html1']);
+        $this->assertEquals('<p>b</p>', $data['html2']);
+
 
     }
 
