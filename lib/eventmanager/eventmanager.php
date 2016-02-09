@@ -72,6 +72,14 @@ class EventManager extends ZendEventManager implements ServiceLocatorAwareInterf
      */
     public function trigger($event, $target = null, $argv = array(), $callback = null)
     {
+        $this->prepareEventForTrigger($event);
+
+        // Отбработать события
+        return parent::trigger($event, $target, $argv, $callback);
+    }
+
+    public function prepareEventForTrigger($event)
+    {
         // Зарегистрировать обратотчики событий.
         if (is_string($event) and isset($this->eventConfig[$event])) {
             if (isset($this->eventConfig[$event]['invokables']) and is_array($this->eventConfig[$event]['invokables'])) {
@@ -88,8 +96,25 @@ class EventManager extends ZendEventManager implements ServiceLocatorAwareInterf
             // Уже зарегистрированные обработчики удаляем.
             unset($this->eventConfig[$event]);
         }
-        // Отбработать события
-        return parent::trigger($event, $target, $argv, $callback);
+    }
+
+    public function getEventListeners($event)
+    {
+        $this->prepareEventForTrigger($event);
+        if (empty($this->events[$event])) {
+            return null;
+        }
+        $handlers = $this->events[$event];
+        $result = [];
+        foreach($handlers as $handler) {
+            if ($handler instanceof \Zend\Stdlib\CallbackHandler) {
+                $result[] = $handler->getCallback();
+            } else {
+                $result[] = $handler;
+            }
+        }
+
+        return $result;
     }
 
     public function registerEventsServices($eventListeners, $event)
