@@ -12,6 +12,7 @@
 
 namespace Rzn\Library\Waterfall;
 use Rzn\Library\Config;
+use Rzn\Library\Exception;
 use Rzn\Library\Format\ArrayMergeTrait;
 
 class Waterfall
@@ -152,6 +153,29 @@ class Waterfall
     {
         $this->functions[$name] = $function;
         return $this;
+    }
+
+    /**
+     * Возврат функций водопада.
+     * Важен для тестов готовности отдельных шагов.
+     *
+     * @param null|string $name
+     * @return array
+     */
+    public function getFunction($name)
+    {
+        if (!isset($this->functions[$name])) {
+            throw new Exception('Дропа ' . $name . ' не существует');
+        }
+        $function = $this->functions[$name];
+
+        if (!is_callable($function)) {
+            $function = $this->collection->getObjectIfShared($this->functions[$name]);
+            return $function;
+        }
+
+        throw new Exception('Дроп  ' . $name . ' уже петерял свое описание');
+
     }
 
     public function setFinalFunction($function)

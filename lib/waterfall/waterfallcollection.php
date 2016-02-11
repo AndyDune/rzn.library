@@ -271,7 +271,7 @@ class WaterfallCollection implements ServiceLocatorAwareInterface, ConfigService
      * @param $channelRetriever
      * @return object
      */
-    protected function getObjectIfShared($channelRetriever)
+    public function getObjectIfShared($channelRetriever)
     {
         if (isset($channelRetriever['callable'])) {
             // Только в целях теста
