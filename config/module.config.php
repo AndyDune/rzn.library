@@ -212,7 +212,30 @@ return array(
             'init.post' => array(
                 'invokables' => [
                     // Прикрепляет к событиям битрикса конфигурируемые
-                    'Rzn\Library\EventListener\BitrixEventsDrive' => 'Rzn\Library\EventListener\BitrixEventsDrive'
+                    'Rzn\Library\EventListener\BitrixEventsDrive' => 'Rzn\Library\EventListener\BitrixEventsDrive',
+                    // Присоединение слушателей событий полностью по правилам битрикса
+                    'BitrixDirectEventsDrive' => [
+                        'name' => 'Rzn\Library\EventListener\BitrixDirectEventsDrive',
+                        'injector' => [
+                            'injectConfig' => [
+                                'handler' => 'setter',
+                                'options' => [
+                                    'set' => 'service',
+                                    'service' => 'config',
+                                    'method' => 'setConfigService'
+                                ]
+                            ],
+                            'injectInjector' => [
+                                'handler' => 'setter',
+                                'options' => [
+                                    'set' => 'service',
+                                    'service' => 'injector',
+                                    'method' => 'setInjector'
+                                ]
+                            ]
+
+                        ]
+                    ]
                 ],
             ),
         ],
