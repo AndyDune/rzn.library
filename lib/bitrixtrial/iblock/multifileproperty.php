@@ -55,6 +55,9 @@ class MultiFileProperty
     protected $dataToSaveArray = [];
     protected $deleteToSaveArray = [];
     protected $sortToSaveArray = [];
+
+    protected $sortToSaveDefault = null;
+
     protected $descriptionToSaveArray = [];
 
 
@@ -164,7 +167,9 @@ class MultiFileProperty
         $props = CIBlockElement::GetProperty($this->iblockId, $this->elementId, $order, ["CODE" => $this->propertyCode]);
         $results = [];
         while ($prop = $props->Fetch()) {
-            $results[] = $prop;
+            if ($prop['VALUE']) {
+                $results[] = $prop;
+            }
         }
         $this->existDataArray = $results;
         return $results;
@@ -237,9 +242,10 @@ class MultiFileProperty
      * @param $array
      * @return $this
      */
-    public function setSortArray($array)
+    public function setSortArray($array, $default = null)
     {
         $this->sortToSaveArray = $array;
+        $this->sortToSaveDefault = $default;
         return $this;
     }
 
@@ -365,9 +371,14 @@ class MultiFileProperty
                 if (isset($this->descriptionToSaveArray[$key]) and $this->descriptionToSaveArray[$key]) {
                     $item['DESCRIPTION'] = $this->descriptionToSaveArray[$key];
                 }
+
                 // Прикрепляем сортировку
-                if (isset($this->sortToSaveArray[$key]) and $this->sortToSaveArray[$key]) {
-                    $item['DESCRIPTION'] = $this->sortToSaveArray[$key]
+                if (isset($this->sortToSaveArray[$key]) and (int)$this->sortToSaveArray[$key]) {
+                    $item['DESCRIPTION'] = (int)$this->sortToSaveArray[$key]
+                        . $this->descriptionSeparatorAfterOrder
+                        . $item['DESCRIPTION'];
+                } else if ($this->sortToSaveDefault) {
+                    $item['DESCRIPTION'] = $this->sortToSaveDefault
                         . $this->descriptionSeparatorAfterOrder
                         . $item['DESCRIPTION'];
                 }

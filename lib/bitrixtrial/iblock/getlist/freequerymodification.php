@@ -48,6 +48,16 @@ class FreeQueryModification extends CIBlockElement
         }
     }
 
+    /**
+     * List of elements.
+     *
+     * @param array $arOrder
+     * @param array $arFilter
+     * @param bool|array $arGroupBy
+     * @param bool|array $arNavStartParams
+     * @param array $arSelectFields
+     * @return CIBlockResult
+     */
     function GetList($arOrder=Array("SORT"=>"ASC"), $arFilter=Array(), $arGroupBy=false, $arNavStartParams=false, $arSelectFields=Array())
     {
         /*
