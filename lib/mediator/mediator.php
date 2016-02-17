@@ -88,7 +88,10 @@ class Mediator implements ConfigServiceAwareInterface, ServiceLocatorAwareInterf
                         $this->subscribe($channel, $service->getFunctionForMediatorSubscribe($channel));
                     } else if (is_callable($service)) {
                         // Класс объекта имеет метод __invoke
-                        $this->subscribe($channel, function ($arguments) use ($service) {
+                        $this->subscribe($channel, function ($arguments, $options = null) use ($service) {
+                            if ($options) {
+                                return call_user_func($service, $arguments, $options);
+                            }
                             return call_user_func($service, $arguments);
                         });
 
