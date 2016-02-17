@@ -144,7 +144,7 @@ class Mediator implements ConfigServiceAwareInterface, ServiceLocatorAwareInterf
         return $this;
     }
 
-    public function publish($channel, $arguments = null)
+    public function publish($channel, $arguments = null, $options = null)
     {
         $result = null;
         // Перед запуском канала смотрим слушателе его в конфиге
@@ -152,6 +152,11 @@ class Mediator implements ConfigServiceAwareInterface, ServiceLocatorAwareInterf
         if (!isset($this->channels[$channel])) {
             new Exception('Канал не существует.', 2);
         }
+
+        if ($options) {
+            return call_user_func($this->channels[$channel], $arguments, $options);
+        }
+
         return call_user_func($this->channels[$channel], $arguments);
     }
 
