@@ -357,14 +357,16 @@ class Waterfall
             if (!$err and !$resultObject->isFinished()) {
                 // Если селектор маршрута не выдал ошибок и не остановил работу водопада
                 foreach ($this->functions as $functionName => $function) {
-                    // Сброс содержимого объекта результатов
-                    if (!$this->resultShared) {
-                        $resultObject->reset();
-                    }
                     // Пропуск дропа водапада на указанном маршруте - если маршрут указан
                     if ($route and !in_array($functionName, $route)) {
                         continue;
                     }
+
+                    // Сброс содержимого объекта результатов
+                    if (!$this->resultShared) {
+                        $resultObject->reset();
+                    }
+
                     // В результат помещаем имя текущей функции - для допустимого дебага
                     $resultObject->setCurrentFunction($functionName);
                     if (!is_callable($function)) {
