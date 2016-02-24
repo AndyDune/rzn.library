@@ -83,6 +83,15 @@ class WaterfallTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(false === $result['x']);
         $this->assertTrue(null === $result['y'], 'Параметры в этой конфигурации не должны разделяться между дропами');
 
+        // Проверка разделяемых входных параметров и их хначений по-умолчанию
+        $result = $waterfall->execute('auto_test');
+        $this->assertTrue(null === $result['shared1'], 'Разделяемый параметр не стал таковым');
+        $this->assertTrue('all' === $result['shared2'], 'Параметры в этой конфигурации не должны разделяться между дропами');
+
+        // Проверка разделяемых входных параметров и перегрузка значений по-умолчанию.
+        $result = $waterfall->execute('auto_test', ['shared1' => 'point']);
+        $this->assertTrue('point' === $result['shared1'], 'Разделяемый параметр не стал таковым');
+
         // Проверки передачи параметров в дроп
         $user = Registry::getUser();
         $this->assertTrue($user == $result['user'], 'Не произошло инъекции');

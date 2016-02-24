@@ -1,18 +1,17 @@
 <?php
- /**
-  * ----------------------------------------------------
-  * | Автор: Андрей Рыжов (Dune) <info@rznw.ru>         |
-  * | Сайт: www.rznw.ru                                 |
-  * | Телефон: +7 (4912) 51-10-23                       |
-  * | Дата: 16.06.2015                                      
-  * ----------------------------------------------------
-  *
-  */
+/**
+ * ----------------------------------------------------
+ * | Автор: Андрей Рыжов (Dune) <info@rznw.ru>         |
+ * | Сайт: www.rznw.ru                                 |
+ * | Телефон: +7 (4912) 51-10-23                       |
+ * | Дата: 16.06.2015
+ * ----------------------------------------------------
+ *
+ */
 
 
 namespace Rzn\Library\Waterfall;
 use Rzn\Library\Config;
-use Rzn\Library\Exception;
 use Rzn\Library\Format\ArrayMergeTrait;
 
 class Waterfall
@@ -80,6 +79,8 @@ class Waterfall
 
     protected $inputParams = null;
 
+    protected $sharedParams = null;
+
     public function __construct($name = null, WaterfallCollection $collection)
     {
         $this->name = $name;
@@ -117,6 +118,30 @@ class Waterfall
             $params = $params->toArray();
         }
         $this->inputParams = $params;
+    }
+
+    /**
+     * Внедрение списка входных параметров, которые будут помечены как разделяемые.
+     * Разделяемые входные параметры - это те, что доступны в каждом дропе, без специальных действий.
+     *
+     * Формат внедрния:
+     * [
+     *   <имя параметра> => <значение параметра по-умолчанию>,
+     *   <имя параметра>  // ключ - число, значение по-умолчанию null
+     *   ...
+     * ]
+     *
+     * @param $params
+     */
+    public function setSharedParams($params)
+    {
+        foreach ($params as $key => $value) {
+            if (is_numeric($key)) {
+                $this->sharedParams[$value] = null;
+            } else {
+                $this->sharedParams[$key] = $value;
+            }
+        }
     }
 
 
@@ -316,7 +341,6 @@ class Waterfall
         return $this->config;
     }
 
-
     /**
      * @param null|array $params
      * @param null|string $route Имя марштрута для запуска
@@ -332,6 +356,16 @@ class Waterfall
             $resultObject = new Result($this);
             if ($this->resultShared) {
                 $resultObject->setResults($params);
+            }
+
+            if ($this->sharedParams) {
+                foreach ($this->sharedParams as $paramName => $defaulValue) {
+                    if (isset($params[$paramName])) {
+                        $resultObject->addSharedResult($paramName, $params[$paramName]);
+                    } else {
+                        $resultObject->addSharedResult($paramName, $defaulValue);
+                    }
+                }
             }
 
             // При запуске водопада явно указан маршрут
@@ -438,7 +472,7 @@ class Waterfall
                 return $resultObject;
             }
             return $resultObject;
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             // todo возможно усовершенствовать реакцию на ошибки - пока отправка ошибки наружу
             throw new Exception($e->getMessage(), $e->getCode());
             //echo $e->getMessage();
