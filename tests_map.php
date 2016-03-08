@@ -11,5 +11,6 @@
 
 return [
     'array_modif' => ['Rzn\Library\Format\ArrayModificationTest', 'tests/format/arraymodificationTest.php'],
-    'waterfall'   => ['Rzn\Library\Tests\WaterfallTest', 'tests/waterfallTest.php']
+    'waterfall'   => ['Rzn\Library\Tests\WaterfallTest', 'tests/waterfallTest.php'],
+    'iblock_info'   => ['Rzn\Library\Tests\IblockInfoTest', 'tests/iblockinfoTest.php']
 ];
