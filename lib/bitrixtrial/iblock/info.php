@@ -36,4 +36,25 @@ class Info
         }
         return $this->iblocks[$code]['ID'];
     }
+
+    public function getIblockVersionWithCode($code)
+    {
+        if (array_key_exists($code, $this->iblocks)) {
+            if (!$this->iblocks[$code]) {
+                return null;
+            }
+            return $this->iblocks[$code]['VERSION'];
+        }
+
+        $this->iblocks[$code] = CIBlock::GetList([], [
+            "CODE" => $code,
+            'ACTIVE' => 'Y'
+        ])->Fetch();
+
+        if (!$this->iblocks[$code]) {
+            return null;
+        }
+        return $this->iblocks[$code]['VERSION'];
+    }
+
 }
