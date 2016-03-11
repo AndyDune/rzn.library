@@ -17,6 +17,8 @@ class Info
 {
     protected $iblocks = [];
 
+    protected $iblockInfo = [];
+
     public function getIblockIdWithCode($code)
     {
         if (array_key_exists($code, $this->iblocks)) {
@@ -26,10 +28,7 @@ class Info
             return $this->iblocks[$code]['ID'];
         }
 
-        $this->iblocks[$code] = CIBlock::GetList([], [
-            "CODE" => $code,
-            'ACTIVE' => 'Y'
-        ])->Fetch();
+        $this->retrieveIblockInfoWithCode($code);
 
         if (!$this->iblocks[$code]) {
             return null;
@@ -46,15 +45,38 @@ class Info
             return $this->iblocks[$code]['VERSION'];
         }
 
-        $this->iblocks[$code] = CIBlock::GetList([], [
-            "CODE" => $code,
-            'ACTIVE' => 'Y'
-        ])->Fetch();
+        $this->retrieveIblockInfoWithCode($code);
 
         if (!$this->iblocks[$code]) {
             return null;
         }
         return $this->iblocks[$code]['VERSION'];
     }
+
+    public function getIblockPropertyInfoWithCode($code)
+    {
+        if (array_key_exists($code, $this->iblockInfo)) {
+            return $this->iblockInfo[$code];
+        }
+
+        $this->retrieveIblockInfoWithCode($code);
+
+        if (!$this->iblocks[$code]) {
+            return null;
+        }
+        $this->iblockInfo[$code] = new Property($this->iblocks[$code]['ID']);
+        return $this->iblockInfo[$code];
+    }
+
+
+    protected function retrieveIblockInfoWithCode($code)
+    {
+        return $this->iblocks[$code] = CIBlock::GetList([], [
+            "CODE" => $code,
+            'ACTIVE' => 'Y'
+        ])->Fetch();
+
+    }
+
 
 }
