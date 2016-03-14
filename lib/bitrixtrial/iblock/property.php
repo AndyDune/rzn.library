@@ -6,6 +6,8 @@
 
 namespace Rzn\Library\BitrixTrial\Iblock;
 use Rzn\Library\Exception;
+use CIBlockProperty;
+
 class Property
 {
     protected $_iblockId = null;

@@ -53,6 +53,10 @@ class Info
         return $this->iblocks[$code]['VERSION'];
     }
 
+    /**
+     * @param $code
+     * @return Property
+     */
     public function getIblockPropertyInfoWithCode($code)
     {
         if (array_key_exists($code, $this->iblockInfo)) {
