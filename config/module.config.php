@@ -123,6 +123,7 @@ return array(
             // Первое применение: передача параметогм фильтра от умного фильтра к компоненту списка товаров.
             ,'storage'  => 'Rzn\Library\Storage'
             ,'inner_messages'  => 'Rzn\Library\InnerMessage\Manager'
+            ,'iblock_info'     => 'Rzn\Library\BitrixTrial\Iblock\Info'
 
         ),
 

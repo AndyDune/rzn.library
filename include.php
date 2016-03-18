@@ -133,16 +133,19 @@ if ($cacheAllow) {
     $cacheId = 'rzn_config';
     $config = null;
 
-    if ($cache->initCache(360000, $cacheId, $cacheId)) {
+    if ($cache->startDataCache(360000, $cacheId, $cacheId)) {
+        $config = $cacheObjectCreate();
+        $cache->endDataCache(array("config" => $config));
+    } else {
         $res = $cache->getVars();
         if ($res and isset($res['config'])) {
             $config = $res['config'];
         }
     }
+
+    // На всякий случай
     if (!$config) {
         $config = $cacheObjectCreate();
-        $cache->startDataCache(360000, $cacheId, $cacheId);
-        $cache->endDataCache(array("config" => $config));
     }
 } else {
     $config = $cacheObjectCreate();

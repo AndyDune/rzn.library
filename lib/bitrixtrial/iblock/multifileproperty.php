@@ -200,7 +200,7 @@ class MultiFileProperty
                 }
             }
             $value['VALUE_SORT'] = $value['ORDER'] = $sort;
-            $results[] = $value;
+            array_unshift($results, $value);
         }
 
         // Теперь сама сортировка
