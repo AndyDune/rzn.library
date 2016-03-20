@@ -1,7 +1,7 @@
 <?
 $arModuleVersion = array(
-    "VERSION" => "2.23.3",
-    "VERSION_DATE" => "2016-03-18 19:30:00"
+    "VERSION" => "2.24.0",
+    "VERSION_DATE" => "2016-03-20 19:30:00"
 );
 /**
  * Позиции в коде версии:
@@ -11,6 +11,9 @@ $arModuleVersion = array(
  */
 
 /**
+ *
+ * 2.24.0
+ * Добавлен канал медиатора setTimeMarker
  *
  * 2.23.3
  * Кеш конфига

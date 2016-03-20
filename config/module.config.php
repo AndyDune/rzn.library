@@ -82,6 +82,28 @@ return array(
                         ],
                     ]
                 ],
+            /*
+             * Установка текущего маркера времени выполнения
+             * Возвращает накопленный массив
+             * Если в параметрах передать ключ print - возврат отформатированных данных для печати.
+             */
+            'setTimeMarker' =>
+                [
+                    // Подробное описание в классе
+                    'invokable' => 'Rzn\Library\System\WorkflowTimeMarkersHolder',
+                    'injector' => [
+                        'init' => [
+                            'handler' => 'setter',
+                            'options' => [
+                                'set' => 'params',
+                                'params' => true,
+                                'method' => 'setPrint'
+                            ]
+                        ],
+                    ]
+
+                ],
+
         ]
     ],
 
