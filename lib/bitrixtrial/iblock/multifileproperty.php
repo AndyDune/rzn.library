@@ -185,8 +185,24 @@ class MultiFileProperty
         if ($this->existDataArray === null) {
             $this->getProperty();
         }
+
+        $results = $this->sortWithDescription($this->existDataArray);
+
+        return $results;
+    }
+
+    /**
+     * Сортировка спсика картинок по специальным образом сохраненному описанию.
+     * Удаление из описания специальной части.
+     * Может быть использовано оторвано от контекста этого объекта.
+     *
+     * @param $inputArray
+     * @return array
+     */
+    public function sortWithDescription($inputArray)
+    {
         $results = [];
-        foreach ($this->existDataArray as $value) {
+        foreach ($inputArray as $value) {
             $sort = null;
             if ($value['DESCRIPTION']) {
                 $parts = explode($this->descriptionSeparatorAfterOrder, $value['DESCRIPTION']);
