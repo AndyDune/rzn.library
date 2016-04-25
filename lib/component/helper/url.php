@@ -88,6 +88,23 @@ class Url extends HelperAbstract implements ServiceLocatorAwareInterface
             }
 
         }
+
+        if (isset($config['leave_params'])) {
+            // При задании единственного
+            if (!is_array($config['leave_params'])) {
+                $config['leave_params'] = [$config['leave_params']];
+            }
+
+            $leaveParams = [];
+            foreach ($config['leave_params'] as $run) {
+                if (!empty($params[$run])) {
+                    $leaveParams[$run] = $params[$run];
+                }
+            }
+            $params = $leaveParams;
+        }
+
+
         $this->config = $config;
         $url = $this->_buildUrl($url, $subDomain, $params);
         return $url;
@@ -191,11 +208,11 @@ class Url extends HelperAbstract implements ServiceLocatorAwareInterface
         } else {
             $domain = $this->getDomain();
             if ($code) {
-                $url = 'http://' . $code . '.' . $domain . $url;
+                $url = '//' . $code . '.' . $domain . $url;
             } else  if ($this->goToRootSite) {
-                $url = 'http://' . $domain . $url;
+                $url = '//' . $domain . $url;
             } else if (!$this->goToRootSite and $this->currentSubDomain) {
-                $url = 'http://' . $this->currentSubDomain . '.' . $domain . $url;
+                $url = '//' . $this->currentSubDomain . '.' . $domain . $url;
             }
         }
 
