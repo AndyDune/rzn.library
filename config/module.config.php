@@ -200,6 +200,7 @@ return array(
             , 'addJs'        => 'Rzn\Library\Component\Helper\AddJs'
             , 'phoneNumberFormat' => 'Rzn\Library\Component\Helper\PhoneNumberFormat'
             , 'showWithRename' => 'Rzn\Library\Component\Helper\ShowWithRename'
+            , 'deleteZerosAfterDotInNumber' => 'Rzn\Library\Component\Helper\DeleteZerosAfterDotInNumber'
         ),
         'aliases' => array(
             'viewFilePath' => 'viewFilesPath'

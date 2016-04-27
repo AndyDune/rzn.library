@@ -1,7 +1,7 @@
 <?
 $arModuleVersion = array(
-    "VERSION" => "2.24.2",
-    "VERSION_DATE" => "2016-05-25 12:30:00"
+    "VERSION" => "2.25.0",
+    "VERSION_DATE" => "2016-05-27 17:30:00"
 );
 /**
  * Позиции в коде версии:
@@ -11,6 +11,9 @@ $arModuleVersion = array(
  */
 
 /**
+ *
+ * 2.25.0
+ * Добавлен хелпер deleteZerosAfterDotInNumber и тест для него.
  *
  * 2.24.2
  * Добавлен параметр leave_params и убрано явное указание схемы в полном урле.
