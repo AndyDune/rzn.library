@@ -78,6 +78,10 @@ class Curl
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
+        // не проверять SSL сертификат
+        curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        // не проверять Host SSL сертификата
+        curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
         if ($params['connect_timeout']) {
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $params['connect_timeout']);
