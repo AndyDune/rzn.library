@@ -11,6 +11,7 @@
 */
 
 namespace Rzn\Library\BitrixTrial\Iblock;
+use Bitrix\Main\Loader;
 use CIBlock;
 
 class Info 
@@ -18,6 +19,11 @@ class Info
     protected $iblocks = [];
 
     protected $iblockInfo = [];
+
+    public function __construct()
+    {
+        Loader::includeModule('iblock');
+    }
 
     public function getIblockIdWithCode($code)
     {
