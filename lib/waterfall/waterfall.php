@@ -359,13 +359,18 @@ class Waterfall
             }
 
             if ($this->sharedParams) {
+                $sharedParams = [];
                 foreach ($this->sharedParams as $paramName => $defaulValue) {
                     if (isset($params[$paramName])) {
                         $resultObject->addSharedResult($paramName, $params[$paramName]);
+                        $sharedParams[$paramName] = $params[$paramName];
                     } else {
                         $resultObject->addSharedResult($paramName, $defaulValue);
+                        $sharedParams[$paramName] = $defaulValue;
                     }
                 }
+                // Для первого шага
+                $params = $this->arrayMerge($sharedParams, $params);
             }
 
             // При запуске водопада явно указан маршрут
