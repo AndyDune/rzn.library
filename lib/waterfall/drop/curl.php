@@ -83,6 +83,8 @@ class Curl
         // не проверять Host SSL сертификата
         curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0');
+
         if ($params['connect_timeout']) {
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $params['connect_timeout']);
         }
