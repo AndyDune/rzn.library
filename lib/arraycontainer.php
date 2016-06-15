@@ -262,8 +262,10 @@ class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
     ////////////////////////////////////////////////////////////////
 ///////////////////////////////     Методы интерфейса Iterator
     // устанавливает итеретор на первый элемент
+    protected $arrayCountForIteration = 0;
     public function rewind()
     {
+        $this->arrayCountForIteration = count($this->_array);
         return reset($this->_array);
     }
     // возвращает текущий элемент
@@ -280,13 +282,26 @@ class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
     // переходит к следующему элементу
     public function next()
     {
-        return next($this->_array);
+        $this->arrayCountForIteration--;
+        if (!$this->arrayCountForIteration) {
+            return false;
+        }
+
+        $array = each($this->_array);
+        if (!$array) {
+            // Дополнительная защита при изменении массива во время выполнения
+            $this->arrayCountForIteration = 0;
+            return false;
+        }
+        return $array['value'];
     }
     // проверяет, существует ли текущий элемент после выполнения мотода rewind или next
     public function valid()
     {
-        //return isset($this->_array[key($this->_array)]);
-        return array_key_exists(key($this->_array), $this->_array);
+        if ($this->arrayCountForIteration > 0) {
+            return true;
+        }
+        return false;
     }
 /////////////////////////////
 ////////////////////////////////////////////////////////////////
