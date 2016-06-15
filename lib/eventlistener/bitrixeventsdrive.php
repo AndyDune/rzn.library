@@ -172,15 +172,23 @@ class BitrixEventsDrive implements ServiceLocatorAwareInterface
     }
 
 
-    public static function __callStatic($name, $arguments)
+    public static function __callStatic($name, $argumentsIn)
     {
         $eventManager = self::$serviceManager->get('event_manager');
+
+        $arguments = $eventManager->prepareArgs($argumentsIn);
 
         $parts = explode('_', $name);
         if (isset($parts[0]) and isset($parts[1])) {
             self::$instance->registerListeners($parts[0], $parts[1]);
         }
         $res = $eventManager->trigger($name, self::$instance, $arguments);
+
+        $arguments = $arguments->getArrayCopy();
+        foreach($arguments as $key => $value) {
+            $argumentsIn[$key] = $value;
+        }
+
         if ($res->stopped()) {
             $app = Registry::getApplication();
             $app->ThrowException($res->last());
