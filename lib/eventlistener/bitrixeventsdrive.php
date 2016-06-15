@@ -68,9 +68,6 @@ class BitrixEventsDrive implements ServiceLocatorAwareInterface
         // user.register.before -> main_OnBeforeUserRegister
         $eventManager->addEventHandlerCompatible("main", "OnBeforeUserRegister", array(__CLASS__, 'onBeforeUserRegister'), false, 100);
 
-        // user.changepassword.before -> main_OnBeforeUserChangePassword
-        $eventManager->addEventHandlerCompatible("main", "OnBeforeUserChangePassword", array(__CLASS__, 'onBeforeUserChangePassword'), false, 100);
-
         // main_OnBuildGlobalMenu
         $eventManager->addEventHandlerCompatible("main", "OnBuildGlobalMenu", array(__CLASS__, 'OnBuildGlobalMenu'), false, 100);
 
@@ -360,22 +357,6 @@ class BitrixEventsDrive implements ServiceLocatorAwareInterface
 
     }
 
-
-    public static function onBeforeUserChangePassword(&$arFields)
-    {
-        $eventManager = self::$eventManager;
-        $arFields = $eventManager->prepareArgs($arFields);
-
-        // user.changepassword.before -> main_OnBeforeUserChangePassword
-        $res = $eventManager->trigger('main_OnBeforeUserChangePassword', self::$instance, $arFields);
-        $arFields = $arFields->getArrayCopy();
-        if ($res->stopped()) {
-            $app = Registry::getApplication();
-            $app->ThrowException($res->last());
-            return false;
-        }
-
-    }
 
     public static function onAfterUserLogin(&$arFields)
     {
