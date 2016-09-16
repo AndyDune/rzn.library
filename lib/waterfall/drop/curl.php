@@ -89,6 +89,12 @@ class Curl
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $params['connect_timeout']);
         }
 
+        if (isset($params['headers']) and is_array($params['headers'])) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $params['headers']);
+        } else if  (isset($params['header']) and is_array($params['header'])) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $params['header']);
+        }
+
         /**
          * php://input
          */
