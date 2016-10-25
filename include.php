@@ -115,14 +115,18 @@ if (file_exists($fileAllowCache)) {
     $cacheAllow = false;
 }
 
-$cacheObjectCreate = function() {
+$arInstalledModules = Bitrix\Main\ModuleManager::getInstalledModules();
+
+$cacheObjectCreate = function() use ($arInstalledModules) {
     $config = new Rzn\Library\Config([]);
     $config->addModule('rzn.library');
     $config->addApplication();
 
     if ($config['modules'] and count($config['modules'])) {
         foreach ($config['modules'] as $module) {
-            $config->addModule($module);
+            if (isset($arInstalledModules[$module])) {
+                $config->addModule($module);
+            }
         }
     }
     return $config;
