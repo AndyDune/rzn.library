@@ -25,7 +25,16 @@ class Service implements ServiceLocatorAwareInterface
         } else {
             $method = 'set' . ucfirst($params['set']);
         }
-        call_user_func([$object, $method], $this->getServiceLocator()->get($params['service']));
+
+        $serviceLocator = $this->getServiceLocator();
+        if ($serviceLocator->has($params['service'])) {
+            $service = $serviceLocator->get($params['service']);
+        } else {
+            $service = null;
+        }
+
+        // В любом случае фиксируем факт передачи параметра
+        call_user_func([$object, $method], $service);
     }
 
     /**
