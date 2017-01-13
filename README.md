@@ -196,12 +196,12 @@ $eventManager->addEventHandlerCompatible("iblock", "OnBeforeIBlockElementAdd", f
 
 Пример класса, который принимает параметры и модифицирует их.
 
-Рассмотрю событие Sale OnBeforeBasketUpdate - оно запускается в скрипте: *\bitrix\modules\sale\general\basket.php* (строка 1459) 
+Рассмотрю событие Sale OnBeforeBasketUpdate - оно запускается в скрипте: *\bitrix\modules\sale\general\basket.php* (строка 1450) 
 
 ```php
-		foreach(GetModuleEvents("sale", "OnBeforeBasketUpdateAfterCheck", true) as $arEvent)
-			if (ExecuteModuleEventEx($arEvent, array($ID, &$arFields))===false)
-				return false;
+foreach(GetModuleEvents("sale", "OnBeforeBasketUpdate", true) as $arEvent)
+    if (ExecuteModuleEventEx($arEvent, array($ID, &$arFields))===false)
+        return false;
 ```
 2 параметра:
 
