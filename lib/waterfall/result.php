@@ -187,10 +187,9 @@ class Result implements ArrayAccess
     public function finish($finalParams = [])
     {
         if (count($finalParams)) {
-            if (!is_array($this->results)) {
-                $this->results = [];
+            foreach($finalParams as $key => $value) {
+                $this->offsetSet($key, $value);
             }
-            $this->results = $this->arrayMerge($this->results, $finalParams);
         }
         $this->finish = true;
     }
@@ -367,6 +366,11 @@ class Result implements ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
+        if (array_key_exists($offset, $this->sharedResults)) {
+            $this->addSharedResult($offset, $value);
+            $this->results[$offset] = $value; // todo удалить после распространения
+            return;
+        }
         $this->results[$offset] = $value;
     }
 
