@@ -4,6 +4,88 @@ rzn.library
 
 Основу программирования на основе библиотеки закладывает конфигурация. Файл конфигурации может содержать любую информацию: описание ключевых параметров, сервисов, помошников компонентов, каналов медиатора и описания водопадов.
 
+
+## Дерево конфигурации
+
+В кажом модуле, который указан в конфигурации приложения может быть файл */local/modules/<модуль>/config/module.config.php* с базовым содержимым:
+
+Секции под ключами invoke и factory для сервисов, помогаторов, слушателей событий идентичны
+
+```php
+return array(
+    'service_manager' => [
+        'invokables' => [
+            '<имя сервиса>' => [
+                'name'=> '<полное имя класса>',
+                'injector' => <массив с описанием инъекций>
+                'shared'=> <true|false - по умолчанию true>, // вкл/откл сохранения объекта для повторного возврата
+            ],
+        ],
+        'factories' => [
+           '<имя сервиса>' => [
+                'name'=> '<полное имя класса фабрики>',
+                'injector' => <массив с описанием инъекций>
+                'shared'=> <true|false - по умолчанию true>, // вкл/откл сохранения объекта для повторного возврата
+            ],
+
+        ]
+    ],
+    'view_helpers' => [
+    /*
+    Возвращаемый объект-помогатор должен иметь метод __invoke для прямого запуска
+    */
+        'invokables' => [
+            '<имя помогатора>' => [
+                'name'=> '<полное имя класса>',
+                'injector' => <массив с описанием инъекций>
+                'shared'=> <true|false - по умолчанию true>, // вкл/откл сохранения объекта для повторного возврата
+            ],
+        ],
+        'factories' => [
+           '<имя помогатора>' => [
+                'name'=> '<полное имя класса фабрики>',
+                'injector' => <массив с описанием инъекций>
+                'shared'=> <true|false - по умолчанию true>, // вкл/откл сохранения объекта для повторного возврата
+            ],
+
+        ]
+
+    ],
+   'configurable_event_manager' => [
+        'listeners' => [
+            '<имя события>' => [
+                'invokables' => [
+                    '<имя слушателя - произвольная строка>' => [
+                        'name' => '<класс слушателя с методом __invoke>',
+                        // включение инъекции по интерфейсам
+                        'injector' => [
+                            'inject' => [
+                                'handler' => 'initializer',
+                                'options' => []
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ],
+    'mediator' => [<массив описание медиаторов>],
+    'waterfall' => [<массив описания водопадов>],
+    'bitrix_events' => [
+        'main' => [ // модуль события битрикса
+            'OnPageStart' => [ // имя события битрикса
+                '<имя слушателя - произвольная строка>' => [
+                        'name' => '<класс слушателя с методом __invoke>',
+                        'injector' => []
+                ]            
+            ]
+        ]
+    ]
+    
+
+
+```
+
 Рекомендую к просмотру базовую папку для кустомного кода в битриксе [local](https://github.com/AndyDune/bitrix_local). Здесь папка congif содержит в себе основной конфиг, который определяет настройки для всего приложения. Этот файл загружается самым первым.
 #### Содержимое файла application.config.php
 ```php
@@ -33,7 +115,7 @@ return array(
 
 Описание для подключения в качестве субмодуля смотреть здесь: http://git-scm.com/book/ru/v1/Инструменты-Git-Подмодули
 
-#### Присоединение тестовой части конфига
+## Присоединение тестовой части конфига
 Есть возможность не изменяя файлы конфига, которые размещены в основной части (local/config/application.config.php) в модулях и шаблонах.
 Более того, тестовые участки не попадают в репозиторий, остаются только на машине текущего программиста.
 
@@ -73,8 +155,138 @@ local/config/local.config.php содержит
 
 Точно так же можно перегрузить сервисы, хелперы, медиаторы, водопады (для перегрузки дропов нужно дать им символьные ключи).
 
+## События
 
-#### Инъекция 
+### Перегрузка событий битрикса
+
+#### Классическое присоединение слушателей к событиям
+
+События битрикса по рекомендации описываются в init.php. Как слушатели выступают функции или статичные методы:
+
+```php
+// Статичный метод
+AddEventHandler("iblock", "OnBeforeIBlockElementAdd", Array("<имя класса>", "имя метода"));
+
+// Функция
+AddEventHandler("iblock", "OnBeforeIBlockElementAdd", "имя функции");
+```
+Более продвинутый метод  - это анонимные функции:
+
+```php
+use Bitrix\Main\EventManager;
+$eventManager = EventManager::getInstance();
+
+$eventManager->addEventHandlerCompatible("iblock", "OnBeforeIBlockElementAdd", function(&$arFields) {
+    // код функции
+});
+
+```
+Применение анонимных функций более удобный вариант - объявление кода на месте, нет конфликтов имен. Это в случае размещения кода в init.php
+
+Но все это плохо при большой кодовой базе.
+
+#### Слушатели событий битрикса на основе rzn.library
+
+Буду использовать некий модуль rzn.test - он должен быть уставновлен в битриксе и прописан в секции *modules* в конфиге приложения (см. ниже).
+
+Главный принцип - описательность. Используются только объекты классов, которые хранятся в кастомных модулях. Наименования классов по парвилам d7.
+
+Интерфейс классов событий заимствован из *ZendFW 2*
+
+
+Пример класса, который принимает параметры и модифицирует их.
+
+Рассмотрю событие Sale OnBeforeBasketUpdate - оно запускается в скрипте: *\bitrix\modules\sale\general\basket.php* (строка 1450) 
+
+```php
+foreach(GetModuleEvents("sale", "OnBeforeBasketUpdate", true) as $arEvent)
+    if (ExecuteModuleEventEx($arEvent, array($ID, &$arFields))===false)
+        return false;
+```
+2 параметра:
+
+- $ID - стандартная передача
+- $arFields - по ссылке, может быть мождифицировано
+
+В кастомном механизмусе параметры упаковываются в объект \ArrayAccess для возможности изменения параметров внутри слушателей.
+
+```php
+namespace Rzn\Test\EventListener\Sale\OnBeforeBasketUpdate;
+
+class ApplyNewPriceForUser
+{
+
+    /**
+     * @param $e \Rzn\Library\EventManager\Event
+     */
+    public function __invoke($e)
+    {
+       /*
+        Извлечение параметров, которые передал битрикс
+        Это объект, поэмому значения, которые будут в нем изменены передадутся наружу
+       */
+       /** @var \ArrayAccess  $params */
+        $params = $e->getParams();
+        
+        $ID = $params[0];
+        // имеют числовий ключи
+        $arFields = $params[1];
+
+        if (!isset($arFields['PRODUCT_ID']) or !$arFields['PRODUCT_ID']) {
+            $id = $params[0];
+            $data = \CSaleBasket::GetByID($id);
+            if (!$data) {
+                return;
+            }
+            $arFields['PRODUCT_ID'] = $data['PRODUCT_ID'];
+        }
+        
+        // Моежм изменить цену для корзины
+        $price = $this->getNewPrice();
+        if ($price) {
+            $arFields['PRICE'] = $price;
+        }
+        // Параметр будет изменен
+        $params[1] = $arFields;
+    }
+
+}
+```
+
+Класс создан, расположен в модуле по урлу: */local/modules/rzn.test/lib/sale/onbeforebasketupdate/applynewpriceforuser.php* может автоматически загрузиться битриксом.
+
+Для присоединения в качестве слушателя нужно прописать в конфиге модуля */local/modules/rzn.test/config/module.config.php*
+
+```php
+'bitrix_events' => [
+        'sale' => [
+           'OnBeforeBasketUpdate' => [
+                'invokables' => [
+                    'ApplyNewPriceForUser' => [
+                        'name' => 'Rzn\Test\EventListener\Sale\OnBeforeBasketUpdate\ApplyNewPriceForUser',
+                    ]
+                ]
+            ]
+        ]
+ ]
+```
+или 
+
+```php
+'bitrix_events' => [
+        'sale' => [
+           'OnBeforeBasketUpdate' => [
+                'invokables' => [
+                    'ApplyNewPriceForUser' => [
+                        'Rzn\Test\EventListener\Sale\OnBeforeBasketUpdate\ApplyNewPriceForUser',
+                    ]
+                ]
+            ]
+        ]
+ ]
+```
+
+## Инъекция 
 
 Инъекции в основном описываются в конфиге вместе c сущностями, к которым они применяются. Сущности: все сервисы (service_manager, helper_manager, custom_service_managers, event_manager), канала медиатора и водопады.
 
