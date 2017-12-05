@@ -199,28 +199,40 @@ class Session implements \Iterator, \ArrayAccess, \Countable, InvokeInterface
 
     /**
      * Возвращает весь массив области.
+     *
+     * @param bool $arrayContainer включение возврата данных к контейнере.
+     * @return ArrayContainer|array
      */
-    public function getZone($array_container = false)
+    public function getZone($arrayContainer = false)
     {
-        if ($array_container)
-            return new \Rzn\Library\ArrayContainer($_SESSION[$this->_usingZone]);
+        if ($arrayContainer)
+            return new ArrayContainer($_SESSION[$this->_usingZone]);
         return $_SESSION[$this->_usingZone];
     }
 
     /**
      * Псевдоним функции getZone
+     * @param bool $arrayContainer включение возврата данных к контейнере.
+     * @return ArrayContainer|array
      */
-    public function getArrayCopy($array_container = false)
+    public function getArrayCopy($arrayContainer = false)
     {
-        return $this->getZone($array_container);
+        return $this->getZone($arrayContainer);
     }
 
     /**
-     * Установка всей зоны
+     * Установка всей зоны.
+     * Использовать с осторожностью.
+     *
+     * @param array $array
+     * @throws Exception
      */
     public function setZone($array = array())
     {
         $this->_canEditZone();
+        if (!is_array($array)) {
+            $array = [$array];
+        }
         $_SESSION[$this->_usingZone] = $array;
     }
 
@@ -307,10 +319,7 @@ class Session implements \Iterator, \ArrayAccess, \Countable, InvokeInterface
 ///////////////////////////////     Магические методы
     public function __set($name, $value)
     {
-        $this->_canEditZone();
-        $_SESSION[$this->_usingZone][$name] = $value;
-        
-        //$_SESSION[$this->_usingZone . $name] = $value;
+        $this->offsetSet($name, $value);
     }
     public function __get($name)
     {
