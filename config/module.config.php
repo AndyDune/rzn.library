@@ -1,13 +1,13 @@
 <?php
- /**
-  * ----------------------------------------------------
-  * | Автор: Андрей Рыжов (Dune) <info@rznw.ru>         |
-  * | Сайт: www.rznw.ru                                 |
-  * | Телефон: +7 (4912) 51-10-23                       |
-  * | Дата: 01.11.14
-  * ----------------------------------------------------
-  *
-  */
+/**
+ * ----------------------------------------------------
+ * | Автор: Андрей Рыжов (Dune) <info@rznw.ru>         |
+ * | Сайт: www.rznw.ru                                 |
+ * | Телефон: +7 (4912) 51-10-23                       |
+ * | Дата: 01.11.14
+ * ----------------------------------------------------
+ *
+ */
 return array(
     'waterfall' => [
         'streams' => [
@@ -42,9 +42,9 @@ return array(
                         'stop' => 0, // true для остановки из конфига
                     ],
 
-                    'true'  => ['invokable' => 'Rzn\Library\Test\Waterfall\SetParamsTrue'],
+                    'true' => ['invokable' => 'Rzn\Library\Test\Waterfall\SetParamsTrue'],
                     'false' => ['invokable' => 'Rzn\Library\Test\Waterfall\SetParamsFalse'],
-                    'trueSkip'  => [
+                    'trueSkip' => [
                         'invokable' => 'Rzn\Library\Test\Waterfall\SetParamsTrue',
                         'skip' => true
                     ],
@@ -112,21 +112,21 @@ return array(
             'Rzn\Library\Component\HelperManager' => 'Rzn\Library\Component\HelperManagerFactory',
         ),
         'invokables' => array(
-            'session'  => 'Rzn\Library\Session',
+            'session' => 'Rzn\Library\Session',
             'response' => 'Rzn\Library\Response',
-            'request'  => 'Rzn\Library\Request',
+            'request' => 'Rzn\Library\Request',
 
             'Rzn\Library\EventManager\EventManager' => 'Rzn\Library\EventManager\EventManager',
 
             'IncludeComponentWithTemplate' => 'Rzn\Library\Component\IncludeWithTemplate',
 
             'array_container' => 'Rzn\Library\ArrayContainer',
-            'test_data'       => 'Rzn\Library\Directory\AsArray'
-            ,'cookie'         => 'Rzn\Library\Cookie'
-            ,'completion_tasks' => 'Rzn\Library\CompletionTasks'
-            ,'mediator'         => 'Rzn\Library\Mediator\Mediator'
-            ,'waterfall'        => 'Rzn\Library\Waterfall\WaterfallCollection'
-            ,'waterfall_check'  => ['name' => 'Rzn\Library\Waterfall\Check',
+            'test_data' => 'Rzn\Library\Directory\AsArray'
+        , 'cookie' => 'Rzn\Library\Cookie'
+        , 'completion_tasks' => 'Rzn\Library\CompletionTasks'
+        , 'mediator' => 'Rzn\Library\Mediator\Mediator'
+        , 'waterfall' => 'Rzn\Library\Waterfall\WaterfallCollection'
+        , 'waterfall_check' => ['name' => 'Rzn\Library\Waterfall\Check',
                 'injector' => [
                     'injectCheck' => [
                         'handler' => 'setter',
@@ -138,15 +138,22 @@ return array(
                     ]
                 ]
             ]
-            ,'injector'        => 'Rzn\Library\Injector\Injector'
-            ,'injector_check'        => 'Rzn\Library\Injector\Check'
-            ,'custom_service_managers'  => 'Rzn\Library\ServiceManager\AbstractFactory'
+        , 'injector' => 'Rzn\Library\Injector\Injector'
+        , 'injector_check' => 'Rzn\Library\Injector\Check'
+        , 'custom_service_managers' => 'Rzn\Library\ServiceManager\AbstractFactory'
             // Хранилище данных для передачи между участками кода, есил повляется ткая необходомость
             // Первое применение: передача параметогм фильтра от умного фильтра к компоненту списка товаров.
-            ,'storage'  => 'Rzn\Library\Storage'
-            ,'inner_messages'  => 'Rzn\Library\InnerMessage\Manager'
-            ,'iblock_info'     => 'Rzn\Library\BitrixTrial\Iblock\Info'
-
+        , 'storage' => 'Rzn\Library\Storage'
+        , 'inner_messages' => 'Rzn\Library\InnerMessage\Manager'
+        , 'iblock_info' => 'Rzn\Library\BitrixTrial\Iblock\Info'
+        , 'service_manager_initializer' => [
+                'name' => 'Rzn\Library\ServiceManager\ServiceManagerInitializer',
+                'injector' => [
+                    'init' => [
+                        'handler' => 'initializer',
+                    ],
+                ]
+            ]
         ),
 
         'aliases' => array(
@@ -170,21 +177,21 @@ return array(
             , 'Rzn\Library\InnerMessage\Initializer'
         ]
     ),
-    'view_helpers' => array (
+    'view_helpers' => array(
         'invokables' => array(
 
-            'ajaxbehavior'                 => 'Rzn\Library\Component\Helper\AjaxBehavior',
+            'ajaxbehavior' => 'Rzn\Library\Component\Helper\AjaxBehavior',
             'arrayextractvalueswithprefix' => 'Rzn\Library\Component\Helper\ArrayExtractValuesWithPrefix',
-            'drawimage'                    => 'Rzn\Library\Component\Helper\DrawImage',
-            'drawmaxdimensionforimage'     => 'Rzn\Library\Component\Helper\DrawMaxDimensionForImage',
-            'firstexistvalueinarray'       => 'Rzn\Library\Component\Helper\FirstExistValueInArray',
+            'drawimage' => 'Rzn\Library\Component\Helper\DrawImage',
+            'drawmaxdimensionforimage' => 'Rzn\Library\Component\Helper\DrawMaxDimensionForImage',
+            'firstexistvalueinarray' => 'Rzn\Library\Component\Helper\FirstExistValueInArray',
             'getiblockelementpropertyvaluewithcode' => 'Rzn\Library\Component\Helper\GetIblockElementPropertyValueWithCode',
-            'getorderpropertywithcode'              => 'Rzn\Library\Component\Helper\GetOrderPropertyWithCode',
-            'insertimages'         => 'Rzn\Library\Component\Helper\InsertImages',
-            'pluralform'           => 'Rzn\Library\Component\Helper\PluralForm',
-            'pr'                   => 'Rzn\Library\Component\Helper\Pr',
-            'showerror'            => 'Rzn\Library\Component\Helper\ShowError',
-            'shownote'             => 'Rzn\Library\Component\Helper\ShowNote',
+            'getorderpropertywithcode' => 'Rzn\Library\Component\Helper\GetOrderPropertyWithCode',
+            'insertimages' => 'Rzn\Library\Component\Helper\InsertImages',
+            'pluralform' => 'Rzn\Library\Component\Helper\PluralForm',
+            'pr' => 'Rzn\Library\Component\Helper\Pr',
+            'showerror' => 'Rzn\Library\Component\Helper\ShowError',
+            'shownote' => 'Rzn\Library\Component\Helper\ShowNote',
             'stringwithwhitespace' => 'Rzn\Library\Component\Helper\StringWithWhiteSpace',
 
             'url' => 'Rzn\Library\Component\Helper\Url',
@@ -196,19 +203,19 @@ return array(
             'placeholder' => 'Rzn\Library\Component\Helper\Placeholder',
             'config' => 'Rzn\Library\Component\Helper\Config',
             'isPathBeginWith' => 'Rzn\Library\Component\Helper\IsPathBeginWith'
-            , 'addCss'        => 'Rzn\Library\Component\Helper\AddCss'
-            , 'addJs'        => 'Rzn\Library\Component\Helper\AddJs'
-            , 'phoneNumberFormat' => 'Rzn\Library\Component\Helper\PhoneNumberFormat'
-            , 'showWithRename' => 'Rzn\Library\Component\Helper\ShowWithRename'
-            , 'deleteZerosAfterDotInNumber' => 'Rzn\Library\Component\Helper\DeleteZerosAfterDotInNumber'
+        , 'addCss' => 'Rzn\Library\Component\Helper\AddCss'
+        , 'addJs' => 'Rzn\Library\Component\Helper\AddJs'
+        , 'phoneNumberFormat' => 'Rzn\Library\Component\Helper\PhoneNumberFormat'
+        , 'showWithRename' => 'Rzn\Library\Component\Helper\ShowWithRename'
+        , 'deleteZerosAfterDotInNumber' => 'Rzn\Library\Component\Helper\DeleteZerosAfterDotInNumber'
         ),
         'aliases' => array(
             'viewFilePath' => 'viewFilesPath'
         ),
         'initializers' => array(
             'Rzn\Library\ServiceManager\InterfaceInitializer'
-            , 'Rzn\Library\ServiceManager\Initializer\CookieService'
-            , 'Rzn\Library\ServiceManager\Initializer\ConfigService'
+        , 'Rzn\Library\ServiceManager\Initializer\CookieService'
+        , 'Rzn\Library\ServiceManager\Initializer\ConfigService'
         )
     ),
 
