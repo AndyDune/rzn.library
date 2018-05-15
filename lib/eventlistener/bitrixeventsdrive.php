@@ -57,47 +57,48 @@ class BitrixEventsDrive implements ServiceLocatorAwareInterface
     {
         $eventManager = EventManager::getInstance();
         // user.login.after -> main_OnAfterUserLogin
-        $eventManager->addEventHandlerCompatible("main", "OnAfterUserLogin", array(__CLASS__, 'onAfterUserLogin'), false, 100);
+        //$eventManager->addEventHandlerCompatible("main", "OnAfterUserLogin", array(__CLASS__, 'onAfterUserLogin'), false, 100);
 
         // user.login.before -> main_OnBeforeUserLogin
-        $eventManager->addEventHandlerCompatible("main", "OnBeforeUserLogin", array(__CLASS__, 'onBeforeUserLogin'), false, 100);
+        //$eventManager->addEventHandlerCompatible("main", "OnBeforeUserLogin", array(__CLASS__, 'onBeforeUserLogin'), false, 100);
 
         // main_OnAfterUserRegister
-        $eventManager->addEventHandlerCompatible("main", "OnAfterUserRegister", array(__CLASS__, 'onAfterUserRegister'), false, 100);
+        //$eventManager->addEventHandlerCompatible("main", "OnAfterUserRegister", array(__CLASS__, 'onAfterUserRegister'), false, 100);
 
         // user.register.before -> main_OnBeforeUserRegister
-        $eventManager->addEventHandlerCompatible("main", "OnBeforeUserRegister", array(__CLASS__, 'onBeforeUserRegister'), false, 100);
+        //$eventManager->addEventHandlerCompatible("main", "OnBeforeUserRegister", array(__CLASS__, 'onBeforeUserRegister'), false, 100);
 
         // main_OnBuildGlobalMenu
-        $eventManager->addEventHandlerCompatible("main", "OnBuildGlobalMenu", array(__CLASS__, 'OnBuildGlobalMenu'), false, 100);
+        //$eventManager->addEventHandlerCompatible("main", "OnBuildGlobalMenu", array(__CLASS__, 'OnBuildGlobalMenu'), false, 100);
 
         // iblock_OnBeforeIBlockElementUpdate
-        $eventManager->addEventHandlerCompatible("iblock", "OnBeforeIBlockElementUpdate", array(__CLASS__, 'OnBeforeIBlockElementUpdate'), false, 100);
+        //$eventManager->addEventHandlerCompatible("iblock", "OnBeforeIBlockElementUpdate", array(__CLASS__, 'OnBeforeIBlockElementUpdate'), false, 100);
 
         // iblock.element.add.before -> iblock_OnBeforeIBlockElementAdd
-        $eventManager->addEventHandlerCompatible("iblock", "OnBeforeIBlockElementAdd", array(__CLASS__, 'OnBeforeIBlockElementAdd'), false, 100);
+        //$eventManager->addEventHandlerCompatible("iblock", "OnBeforeIBlockElementAdd", array(__CLASS__, 'OnBeforeIBlockElementAdd'), false, 100);
 
         // main_OnBeforeLocalRedirect
-        $eventManager->addEventHandlerCompatible("main", "OnBeforeLocalRedirect", array(__CLASS__, 'OnBeforeLocalRedirect'), false, 100);
+        //$eventManager->addEventHandlerCompatible("main", "OnBeforeLocalRedirect", array(__CLASS__, 'OnBeforeLocalRedirect'), false, 100);
 
 
 
         // iblock_OnStartIBlockElementAdd
-        $eventManager->addEventHandlerCompatible("iblock", "OnStartIBlockElementAdd", array(__CLASS__, 'OnStartIBlockElementAdd'), false, 100);
+        //$eventManager->addEventHandlerCompatible("iblock", "OnStartIBlockElementAdd", array(__CLASS__, 'OnStartIBlockElementAdd'), false, 100);
 
         // iblock_OnStartIBlockElementUpdate
-        $eventManager->addEventHandlerCompatible("iblock", "OnStartIBlockElementUpdate", array(__CLASS__, 'OnStartIBlockElementUpdate'), false, 100);
+        //$eventManager->addEventHandlerCompatible("iblock", "OnStartIBlockElementUpdate", array(__CLASS__, 'OnStartIBlockElementUpdate'), false, 100);
 
 
         // sale_OnSaleComponentOrderOneStepPaySystem
+        /*
         $eventManager->addEventHandlerCompatible("sale", "OnSaleComponentOrderOneStepPaySystem",
             array(__CLASS__, 'onSaleComponentOrderOneStepPaySystem'), false, 100);
+        */
 
         // Встраивать в bitrix_event
         //$eventManager->addEventHandlerCompatible("main", "OnPageStart", array(__CLASS__, 'onPageStart'), false, 100);
         //$eventManager->addEventHandlerCompatible("main", "OnAfterEpilog", array(__CLASS__, 'onAfterEpilog'), false, 100);
 
-        // Экспериментальный функционал
         $config = $this->getServiceLocator()->get('config');
 
         if ($config['bitrix_events'] and $config['bitrix_events'] instanceof Config) {
