@@ -1,6 +1,6 @@
 rzn.library
 ===========
-Модуль с полезными классами для CMS 1С-Битрникс
+Модуль с полезными классами для CMS 1С-Битрикс
 
 Основу программирования на основе библиотеки закладывает конфигурация. Файл конфигурации может содержать любую информацию: описание ключевых параметров, сервисов, помошников компонентов, каналов медиатора и описания водопадов.
 
@@ -154,6 +154,105 @@ local/config/local.config.php содержит
     ]
 
 Точно так же можно перегрузить сервисы, хелперы, медиаторы, водопады (для перегрузки дропов нужно дать им символьные ключи).
+
+## Менеджер сервисов
+
+### Описание сервиса в конфин файле модуля
+
+Корневой ключ конфиг. массива `service_manager` Менеджер сервисов позволяет управлять инъекциями, создавать объекты с помощью фабрик, сохранять состония объектов между вызовами в разнах местах приложения.
+
+Ниже собственный класс, который я планирную зарегистрировать в системе как вызываемый сервис. Класс реализует интерфейс `ServiceLocatorAwareInterface` который позволяет при включении инъекций через интерфейс внедрить в объект менеджер сервисов.
+```php
+use Rzn\Library\ServiceManager\ServiceLocatorAwareInterface;
+use Rzn\Library\ServiceManager\ServiceLocatorInterface;
+
+class MyService implements ServiceLocatorAwareInterface
+{
+    protected $sm;
+    
+    protected $count = 0;
+    
+    /**
+    * Собственный рабочий метод сервиса
+    */
+    public function countUse()
+    {
+        $this->count++;
+    }
+    
+    public function getCount()
+    {
+        return $this->count;
+    }
+    
+    /**
+    * Извлечение сервиса сессии для использовании внутри объекта класса.
+    * @return \Rzn\Library\Session
+    */
+    protected function getSession()
+    {
+        $this->getServiceLocator()->get('session');
+    }
+    
+    /**
+     * Внедрение сервис локатора
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     */
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->sm = $serviceLocator;
+    }
+
+    /**
+     * Возврат сервис локатора.
+     *
+     * @return ServiceLocatorInterface
+     */
+    public function getServiceLocator()
+    {
+        return $this->sm;
+    }
+}
+```
+
+Описываем сервис в конфиге модуля.
+
+```php
+return array(
+    'service_manager' => [
+        'invokables' => [
+            'MySuperService' => [ // Имя может быть любой строкой
+                'name'=> 'MyService',
+                'injector' => [
+                            'inject' => [
+                                'handler' => 'initializer',
+                         ],
+                'shared'=> true // сохранение создаваемого объекта для последующего возврата при вызове
+            ],
+        ]
+    ]
+);
+```
+
+Для создания и вызова созданного объекта сервиса нужно получить объект менеджера сервисов, для которого в регистри есть специальной метод.
+```php 
+use Rzn\Librabry\Registry;
+/** @var MyService $myobject */
+$myobject = Registry:: getServiceMenager()->get('MySuperService');
+$myobject->countUse();
+echo $myobject->getCount(); // 1
+
+
+// Однажды созданный объект сохраняется внутри менеджера и возвращается при следующем запросе.
+
+/** @var MyService $myobject */
+$myobject = Registry:: getServiceMenager()->get('MySuperService');
+$myobject->countUse();
+echo $myobject->getCount(); // 2
+
+```
+
 
 ## События
 
@@ -387,7 +486,7 @@ class ApplyNewPriceForUser
 #### Водопад
 
 ##### Тестирование описания водопада
-Функции для водопада могут представлять сервосы или объектры указанных класов. В описании обязательно будет инъекции. 
+Функции для водопада могут представлять сервисы или объекты указанных класов. В описании обязательно будет инъекции. 
 
 Для быстрой начальной проверки валидности водопада есть специальный сервис waterfall_check. Его метод checkStream возвращает массив с результатом.
 ```php
