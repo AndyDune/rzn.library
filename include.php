@@ -208,6 +208,10 @@ if ($countParts > 1) {
     Registry::set('HTTP_HOST_BASE', $config['main']['domain']);
 
 
+if (defined('RZN_LIBRARY_NO_EVENTS_ATTACHE')) {
+    return;
+}
+
 $events = $sm->get('event_manager');
 /** @var Zend\EventManager\ResponseCollection $res */
 $res = $events->trigger('init.post', null);
