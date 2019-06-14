@@ -15,5 +15,6 @@ return [
     'iblock_info'   => ['Rzn\Library\Tests\IblockInfoTest', 'tests/iblockinfoTest.php'],
     'time_markers'  => ['Rzn\Library\Tests\WorkflowTimeMarkersHolderTest', 'tests/workflowtimemarkersholderTest.php'],
     'DeleteZerosAfterDotInNumber'  => ['Rzn\Library\Tests\HelperDeleteZerosAfterDotInNumberTest', 'tests/helperdeletezerosafterdotinnumberTest.php'],
-    'array_access' => ['Rzn\Library\Format\ArrayAccessTest', 'tests/arrayaccessTest.php']
+    'array_access' => ['Rzn\Library\Format\ArrayAccessTest', 'tests/arrayaccessTest.php'],
+    'ArrayContainerTest' => ['Rzn\Library\Tests\ArrayContainerTest', 'tests/ArrayContainerTest.php']
 ];
