@@ -36,8 +36,15 @@
  */
 
 namespace Rzn\Library;
+use Rzn\Library\ArrayContainerAction\AbstractAction;
+
 class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
 {
+
+    /**
+     * @var null|AbstractAction
+     */
+    protected $action = null;
 
     protected $_array = array();
     protected $_arraySourse = array();
@@ -53,6 +60,29 @@ class ArrayContainer implements \ArrayAccess, \Iterator, \Countable
     public function __construct($array= null, $defaultValue = null, $nested = false)
     {
         $this->init($array, $defaultValue, $nested);
+    }
+
+    /**
+     * Set strategy pattern action for modification array.
+     * Action callable object resieves whole array in container and return array ro replace.
+     *
+     * @param AbstractAction $action
+     * @return $this
+     */
+    public function setAction(AbstractAction $action)
+    {
+        $this->action = $action;
+        $this->action->setArrayContainer($this);
+        return $this;
+    }
+
+    /**
+     * @param array ...$params
+     * @return mixed
+     */
+    public function executeAction(...$params)
+    {
+        return $this->action->execute(...$params);
     }
 
     public function addFilter($function)
