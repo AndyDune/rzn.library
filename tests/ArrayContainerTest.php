@@ -13,6 +13,7 @@ namespace Rzn\Library\Tests;
 use PHPUnit_Framework_TestCase;
 use Rzn\Library\ArrayContainer;
 use Rzn\Library\ArrayContainerAction\ComputeDifferenceOfArrays;
+use Rzn\Library\ArrayContainerAction\IsOnlyThisKeysInArray;
 
 class ArrayContainerTest extends PHPUnit_Framework_TestCase
 {
@@ -144,5 +145,36 @@ class ArrayContainerTest extends PHPUnit_Framework_TestCase
                 ['rr' => ['rrr' => ['r22' => ['red22']]]]
             );
         $this->assertEquals($arrayWait, $result);
+    }
+
+    /**
+     * @covers \AndyDune\ArrayContainer\Action\IsOnlyThisKeysInArray::execute
+     */
+    public function testIsOnlyThisKeysInArray()
+    {
+        $array = [
+            'r' => 'red',
+            'rr' => [
+                'r1' => 'red1',
+                'rrr' => [
+                    'r2' => 'red2',
+                    'r22' => ['red22']
+                ],
+                'r2' => 'red2',
+            ],
+            'b' => 'blue'
+        ];
+        $container = new ArrayContainer($array);
+        $result = $container->setAction(new IsOnlyThisKeysInArray())->executeAction('r');
+        $this->assertFalse($result);
+
+        $container = new ArrayContainer($array);
+        $result = $container->setAction(new IsOnlyThisKeysInArray())->executeAction('r', ['rr']);
+        $this->assertFalse($result);
+
+        $container = new ArrayContainer($array);
+        $result = $container->setAction(new IsOnlyThisKeysInArray())->executeAction('r', ['rr', 'b']);
+        $this->assertTrue($result);
+
     }
 }
