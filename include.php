@@ -99,6 +99,14 @@ CModule::AddAutoloadClasses(
 
 IncludeModuleLangFile(__FILE__);
 
+function rzn_getenv($varname, $default = false) {
+    $value = getenv($varname);
+    if ($value === false) {
+        return $default;
+    }
+    return $value;
+}
+
 use Rzn\Library\Registry;
 
 $sm = Registry::getServiceManager();
@@ -189,6 +197,12 @@ if (is_file($fileInitLocal)) {
     $config->addConfig(include($fileInitLocal));
 }
 
+$fileInitLocal = $_SERVER['DOCUMENT_ROOT'] . '/local/config/evn.config.php';
+if (is_file($fileInitLocal)) {
+    $config->addConfig(include($fileInitLocal));
+}
+
+
 $sm->setConfig($config['service_manager']);
 
 $sm->initServicesFromConfig();
@@ -211,7 +225,6 @@ if ($countParts > 1) {
 if (defined('RZN_LIBRARY_NO_EVENTS_ATTACHE')) {
     return;
 }
-
 $events = $sm->get('event_manager');
 /** @var Zend\EventManager\ResponseCollection $res */
 $res = $events->trigger('init.post', null);
