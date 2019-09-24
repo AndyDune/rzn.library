@@ -4,6 +4,7 @@
  *
  */
 namespace Rzn\Library\BitrixTrial\Order;
+use CSaleStatus;
 class Reference
 {
 
