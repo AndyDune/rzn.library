@@ -24,11 +24,19 @@ class ComputeDifferenceOfArrays extends AbstractAction
     {
         $arrayResult = $this->arrayContainer->toArray();
 
+        $result = [];
+
         foreach ($arrays as $array) {
-            $arrayResult = $this->diff($arrayResult, $array);
+            $result += $this->diff($arrayResult, $array);
         }
 
-        return $arrayResult;
+        if (!$result) {
+            foreach ($arrays as $array) {
+                $result += $this->diff($array, $arrayResult);
+            }
+        }
+
+        return $result;
     }
 
     /**
