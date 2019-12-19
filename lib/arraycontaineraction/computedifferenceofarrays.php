@@ -27,12 +27,14 @@ class ComputeDifferenceOfArrays extends AbstractAction
         $result = [];
 
         foreach ($arrays as $array) {
-            $result += $this->diff($arrayResult, $array);
+            if ($one = $this->diff($arrayResult, $array)) {
+                $result = array_replace_recursive($result, $one);
+            }
         }
 
-        if (!$result) {
-            foreach ($arrays as $array) {
-                $result += $this->diff($array, $arrayResult);
+        foreach ($arrays as $array) {
+            if ($one = $this->diff($array, $arrayResult)) {
+                $result = array_replace_recursive($result, $one);
             }
         }
 
