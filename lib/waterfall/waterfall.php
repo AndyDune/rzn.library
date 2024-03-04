@@ -418,7 +418,15 @@ class Waterfall
                         $params = $this->arrayMerge($this->defaultDropParams[$functionName], $params);
                     }
 
+                    $start = time();
                     $function($params, $resultObject);
+                    $profile = $resultObject->getSharedResult('functions_profile');
+                    if (!$profile) {
+                        $profile = [];
+                    }
+                    $profile[$functionName] = time() - $start;
+                    $resultObject->addSharedResult('functions_profile', $profile);
+
                     // Выборка содержимого объекта результатов в виде массива для следующих функций в водопаде
                     $params = $resultObject->getResults();
 
